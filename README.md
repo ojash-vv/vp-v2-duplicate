@@ -5,7 +5,7 @@ This repo will contain all kind of nodejs related architectures build on top of 
 
 # how to use this repository.
 
-Run  ```npm install``` or ```npm i``` to install the repository dependencies.
+Run  ```npm install``` or ```npm i``` to install the repository dependencies use node ```v14.0.0```.
 
 Run ```nodemon start``` to automatically start the server.
 
