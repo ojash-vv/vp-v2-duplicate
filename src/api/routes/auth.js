@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { loginUser, signupUser } = require("../controllers/authController");
+const loginRoutes = require("../controllers/authController.js");
+const globaltypecatRoutes = require("../controllers/globaltypecatController");
 
-router.post("/", loginUser);
-router.post("/signup", signupUser);
+router.post("/", function (req, res, next) {
+  res.send("Erorrrrr");
+});
+router.post("/login", loginRoutes.loginUser);
+router.post("/signup", loginRoutes.signupUser);
 
 module.exports = router;
