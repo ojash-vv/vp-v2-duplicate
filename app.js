@@ -1,4 +1,3 @@
-// const connectToDB = require("./dbConnect");
 var indexRouter = require("./src/api/routes");
 
 var express = require("express");
@@ -14,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/v1/", indexRouter);
 app.use(function (req, res, next) {
-  //   next(createError(404));
+  next(createError(404));
 });
 
 app.listen(4004, function () {
@@ -22,5 +21,3 @@ app.listen(4004, function () {
 });
 
 module.exports = app;
-
-// connectToDB();

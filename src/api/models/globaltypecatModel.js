@@ -1,6 +1,6 @@
 const sql = require("../../../dbConnect");
 const QueryIDs = require("../../enums/queryenums");
-// constructor
+
 const Globaltypecategory = function (globalcategory) {
   const unique_value = globalcategory.name;
   this.display_name = globalcategory.name;

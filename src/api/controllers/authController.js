@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-const authModal = require("../models/authModal");
 const validator = require("validator");
 const QueryIDs = require("../../enums/queryenums");
 const db = require("../../../dbConnect");
@@ -44,17 +43,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-const signupUser = async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    const user = await authModal.signup(name, email, password);
-    res.status(200).json({ email, user });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 module.exports = {
   loginUser,
-  signupUser,
 };
