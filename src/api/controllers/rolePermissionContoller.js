@@ -1,6 +1,38 @@
 const RoleAndPermissionsModel = require("../models/rolePermissionModel");
+const { isEmpty } = require("lodash");
 
 const addRoleAndPermissions = (req, res) => {
+  const roleAndPermissions = req?.body;
+  if (!isEmpty(roleAndPermissions)) {
+    for (let i = 0; i < roleAndPermissions.length; i++) {
+      console.log(
+        "🚀 ~ file: rolePermissionContoller.js:8 ~ addRoleAndPermissions ~ roleAndPermissions",
+        roleAndPermissions[i]
+      );
+      const role = new RoleAndPermissionsModel({
+        moduleId: roleAndPermissions[i]?.moduleId,
+        roleId: roleAndPermissions[i]?.roleId,
+        permissions: JSON.stringify(roleAndPermissions[i]?.permissions),
+        createdBy: "user",
+        updatedBy: "user",
+        createdAt: new Date(),
+      });
+      if (role) {
+        RoleAndPermissionsModel.createNewRoleWithPermissions(role, (err, _) => {
+          if (err) {
+            res.json({ status: false, message: err });
+          } else if (i === roleAndPermissions.length - 1) {
+            res.json({
+              status: true,
+              message: "record created successfully",
+            });
+          }
+        });
+      }
+    }
+  }
+};
+const updateRoleAndPermissions = (req, res) => {
   const { moduleId, permissions, roleId } = req?.body;
   if (moduleId) {
     const role = new RoleAndPermissionsModel({
@@ -12,7 +44,7 @@ const addRoleAndPermissions = (req, res) => {
       createdAt: new Date(),
     });
     if (role) {
-      RoleAndPermissionsModel.createNewRoleWithPermissions(role, (err, _) => {
+      RoleAndPermissionsModel.updateRoleWithPermissions(role, (err, _) => {
         if (err) {
           res.send(err);
         } else {
@@ -40,7 +72,8 @@ const getPermissionsByRoleId = (req, res) => {
               data: result.map((item) => ({
                 id: item.id,
                 roleId: item.role_id,
-                permissions: item.permissions,
+                moduleId: item.module_id,
+                permissions: JSON.parse(item.permissions),
                 isDeleted: item.is_deleted,
               })),
             });

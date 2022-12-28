@@ -20,6 +20,21 @@ RoleAndPermissions.createNewRoleWithPermissions = (
     roleAndPermissions,
     (err, res) => {
       if (err) {
+        console.info("Error while inserting the data");
+        return result(err, null);
+      } else {
+        console.info(res);
+        return result(null, res);
+      }
+    }
+  );
+};
+RoleAndPermissions.updateRoleWithPermissions = (roleAndPermissions, result) => {
+  dbConnection.query(
+    "INSERT INTO role_permissions SET ?",
+    roleAndPermissions,
+    (err, res) => {
+      if (err) {
         console.info("Error while featching the data");
         return result(err, null);
       } else {
