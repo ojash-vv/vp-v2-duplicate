@@ -1,13 +1,18 @@
 const mysql = require("mysql");
+const util = require("util");
 
 // create the connection to database
-const dbConnection = mysql.createConnection({
+const dbConnection = mysql.createPool({
   connectionLimit: 100,
-  host: "127.0.0.1",
+  host: "localhost",
   user: "root",
-  password: "VirtueVise@234",
+  password: "password",
   database: "virtuevi_vp",
   port: 3306,
+  timezone: "UTC",
 });
+
+// Promisify for Node.js async/await.
+dbConnection.query = util.promisify(dbConnection.query).bind(dbConnection);
 
 module.exports = dbConnection;

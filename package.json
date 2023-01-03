@@ -24,6 +24,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.6.5",
     "mysql": "^2.18.1",
+    "nodemon": "^2.0.20",
     "validator": "^13.7.0"
   },
   "engines": {
