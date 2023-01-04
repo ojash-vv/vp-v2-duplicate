@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-const QueryIDs = require("../../enums/queryenums");
+const QueryIDs = require("../../enums/queryeNums");
 const db = require("../../../dbConnect");
 var mysql = require("mysql");
 const generateAccessToken = require("../controllers/generateAccessToken");

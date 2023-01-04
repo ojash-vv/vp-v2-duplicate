@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/v1/", indexRouter);
 app.use(function (req, res, next) {
-  next(createError(404));
+  // next(createError(404));
 });
 
 app.listen(4004, function () {
