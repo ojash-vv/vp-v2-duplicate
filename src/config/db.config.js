@@ -1,18 +1,9 @@
-const mysql = require("mysql");
-const util = require("util");
+const { Sequelize } = require("sequelize");
 
-// create the connection to database
-const dbConnection = mysql.createPool({
-  connectionLimit: 100,
+const sequelize = new Sequelize("virtuevi_vp", "root", "password", {
   host: "localhost",
-  user: "root",
-  password: "password",
-  database: "virtuevi_vp",
-  port: 3306,
-  timezone: "UTC",
+  dialect: "mysql",
+  pool: { min: 0, max: 5, idle: 10000 },
 });
 
-// Promisify for Node.js async/await.
-dbConnection.query = util.promisify(dbConnection.query).bind(dbConnection);
-
-module.exports = dbConnection;
+module.exports = sequelize;
