@@ -1,6 +1,6 @@
 const { check } = require("express-validator");
 
-exports.signupValidation = [
+exports.emplpoyeeValidation = [
   check("name", "Name is requied").not().isEmpty(),
   check("email", "Please include a valid email")
     .isEmail()

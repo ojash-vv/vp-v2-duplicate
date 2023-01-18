@@ -1,3 +1,4 @@
+const e = require("express");
 const sql = require("../../../dbConnect");
 const MessageTag = require("../../enums/messageNums");
 const QueryIDs = require("../../enums/queryeNums");
@@ -5,6 +6,7 @@ const QueryIDs = require("../../enums/queryeNums");
 const Globaltypecategory = function (globalcategory) {
   const unique_value = globalcategory?.name?.replace(/ /g, "_");
   this.display_name = globalcategory?.name;
+  this.isActive = globalcategory?.isActive;
   this.unique_value = unique_value?.toLowerCase();
   this.createdAt = new Date(new Date().toUTCString());
   this.updatedAt = new Date(new Date().toUTCString());
@@ -105,6 +107,32 @@ Globaltypecategory.updateById = (id, globlaTypeCategory, result) => {
           );
         }
       }
+    }
+  );
+};
+Globaltypecategory.statusUpdateById = (id, globlaTypeCategory, result) => {
+  if (globlaTypeCategory?.isActive == 1) {
+    isActive = 0;
+  } else {
+    isActive = 1;
+  }
+  sql.query(
+    QueryIDs.UPDTAE_GLOBAL_CAT_STATUS,
+    [isActive, globlaTypeCategory?.updatedAt, id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        // not found Customer with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      result(null, { id: id, ...globlaTypeCategory });
     }
   );
 };

@@ -41,7 +41,41 @@ exports.update = async (req, res) => {
     req.params.categoryId,
     new Globaltypecategory(req.body),
     (err, data) => {
-      console.log(req.params.categoryId);
+      if (err) {
+        console.log(err);
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            error: MessageTag.GTC_NOT,
+          });
+        } else {
+          res.status(500).send({
+            error: err,
+          });
+        }
+      } else {
+        data = ObjectHelper.formatKeys(data);
+        res.status(200).send({
+          status: "success",
+          message: MessageTag.GTC_UPDATE,
+          data: data,
+        });
+      }
+    }
+  );
+};
+
+exports.updateStatus = async (req, res) => {
+  // Validate Request
+  if (!req.body) {
+    res.status(400).send({
+      message: MessageTag.CONTENT_NOT_FOUND,
+    });
+  }
+
+  await Globaltypecategory.statusUpdateById(
+    req.params.categoryId,
+    new Globaltypecategory(req.body),
+    (err, data) => {
       if (err) {
         console.log(err);
         if (err.kind === "not_found") {

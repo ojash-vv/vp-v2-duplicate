@@ -14,8 +14,7 @@ const loginUser = async (req, res) => {
     const user = email;
     db.getConnection(async (err, connection) => {
       if (err) throw err;
-      const sqlSearch =
-        QueryIDs.SELECT_USER + " where user_profissional_email = ?";
+      const sqlSearch = QueryIDs.SELECT_USER + " where userEmail = ?";
       const search_query = mysql.format(sqlSearch, [user]);
       await connection.query(search_query, async (err, result) => {
         connection.release();
@@ -23,7 +22,7 @@ const loginUser = async (req, res) => {
         if (result.length == 0) {
           res.status(401).json({ error: "User does not exist" });
         } else {
-          const hashedPassword = result[0].user_password;
+          const hashedPassword = result[0].userPassword;
 
           if (await bcrypt.compare(password, hashedPassword)) {
             const token = generateAccessToken({ user: user });

@@ -10,6 +10,10 @@ const MessageTag = {
   GLOBALTYPE_EXIST: "Global type already exists!",
   GLOBALTYPE_NOT_EXIST: "Global type not found!",
   GLOBALTYPE_DELETE: "Global type deleted successfully!",
+  GLOBALTYPE_UPDATE: "Global type updated successfully!",
+
+  USER_EXIST: "User Already exists!",
+  USER_ADDED: "User Addedd Successfully!",
 
   ERROR_OCCURRED: "Some error occurred while creating record!",
   CONTENT_NOT_FOUND: "Content can not be empty!",

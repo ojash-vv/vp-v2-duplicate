@@ -5,6 +5,7 @@ const QueryIDs = require("../../enums/queryeNums");
 const Globaltype = function (globaltype) {
   this.globalTypeCategory_uniqeValue = globaltype?.globalTypeCategory;
   this.displayName = globaltype?.name;
+  this.isActive = globaltype?.isActive;
   const unique_value = globaltype?.name;
   this.uniqueValue = unique_value?.toLowerCase();
   this.createdAt = new Date(new Date().toUTCString());
@@ -36,8 +37,9 @@ Globaltype.create = (newData, result) => {
       } else {
         if (row && row.length) {
           sql.query(
-            QueryIDs.SELECT_GLOBAL_TYPE + " where uniqueValue = ?",
-            newData.uniqueValue,
+            QueryIDs.SELECT_GLOBAL_TYPE +
+              " where uniqueValue = ? and globalTypeCategory_uniqeValue = ?",
+            [newData?.uniqueValue, newData?.globalTypeCategory_uniqeValue],
             (err, row) => {
               if (err) {
                 result(err, null);
@@ -79,9 +81,11 @@ Globaltype.getAll = (result) => {
 
 Globaltype.updateById = (id, globlaType, result) => {
   console.log(globlaType?.uniqueValue);
+  console.log(globlaType?.globalTypeCategory_uniqeValue);
   sql.query(
-    QueryIDs.SELECT_GLOBAL_TYPE + " where uniqueValue = ?",
-    globlaType?.uniqueValue,
+    QueryIDs.SELECT_GLOBAL_TYPE +
+      " where uniqueValue = ? and globalTypeCategory_uniqeValue = ?",
+    [globlaType?.uniqueValue, globlaType?.globalTypeCategory_uniqeValue],
     (err, row) => {
       if (err) {
         result(err, null);
@@ -96,6 +100,7 @@ Globaltype.updateById = (id, globlaType, result) => {
             [
               globlaType?.displayName,
               globlaType?.uniqueValue,
+              globlaType?.globalTypeCategory_uniqeValue,
               globlaType?.updatedAt,
               id,
             ],
@@ -118,7 +123,32 @@ Globaltype.updateById = (id, globlaType, result) => {
     }
   );
 };
+Globaltype.statusUpdateById = (id, globlaType, result) => {
+  if (globlaType?.isActive == 1) {
+    isActive = 0;
+  } else {
+    isActive = 1;
+  }
+  sql.query(
+    QueryIDs.UPDTAE_GLOBAL_TYPE_STATUS,
+    [isActive, globlaType?.updatedAt, id],
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
 
+      if (res.affectedRows == 0) {
+        // not found Customer with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      result(null, { id: id, ...globlaType });
+    }
+  );
+};
 Globaltype.remove = (id, result) => {
   sql.query(QueryIDs.DELETE_GLOBAL_TYPE, id, (err, res) => {
     if (err) {
@@ -130,6 +160,7 @@ Globaltype.remove = (id, result) => {
       result({ kind: "not_found" }, null);
       return;
     }
+    console.log(res);
     result(null, res);
   });
 };

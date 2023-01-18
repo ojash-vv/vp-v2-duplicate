@@ -1,27 +1,6 @@
-const Globaltype = require("../models/globaltypeModel");
+const Users = require("../models/employeesModel");
 const ObjectHelper = require("../../utils");
 const MessageTag = require("../../enums/messageNums");
-
-exports.masterglobaltype = async (req, res) => {
-  Globaltype.findByUniqueValue(req?.params?.uniqueValue, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: MessageTag.GLOBALTYPE_NOT_FOUND,
-        });
-      } else {
-        res.status(500).send({
-          message:
-            "Error retrieving Global Type with unique value " +
-            req?.params?.uniqueValue,
-        });
-      }
-    } else {
-      data = ObjectHelper.formatKeys(data);
-      res.send(data);
-    }
-  });
-};
 
 exports.create = async (req, res) => {
   if (!req.body) {
@@ -30,12 +9,22 @@ exports.create = async (req, res) => {
     });
   }
 
-  const globaltype = new Globaltype({
-    globalTypeCategory: req.body.GTC,
-    name: req.body.name,
+  const employee = new Users({
+    empId: req.body.empId,
+    userName: req.body.userName,
+    userEmail: req.body.userEmail,
+    userPersonalEmail: req.body.userPersonalEmail,
+    userPassword: req.body.userPassword,
+    userDesignation: req.body.userDesignation,
+    userRole: req.body.userRole,
+    empMobileNumber: req.body.empMobileNumber,
+    userBirthday: req.body.userBirthday,
+    empStartDate: req.body.empStartDate,
+    empJoinDate: req.body.empJoinDate,
+    empJoinDate: req.body.empJoinDate,
   });
 
-  await Globaltype.create(globaltype, (err, data) => {
+  await Users.create(employee, (err, data) => {
     if (err) {
       res.status(500).send({
         error: err || MessageTag.ERROR_OCCURRED,
@@ -44,7 +33,7 @@ exports.create = async (req, res) => {
       data = ObjectHelper.formatKeys(data);
       res.status(200).send({
         status: "success",
-        message: MessageTag.GLOBALTYPE_ADD,
+        message: MessageTag.USER_ADDED,
         data: data,
       });
     }
@@ -52,13 +41,29 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-  Globaltype.getAll((err, data) => {
+  Users.getAll((err, data) => {
     if (err)
       res.status(500).send({
         message: err.message || MessageTag.ERROR_OCCURRED,
       });
-    else data = ObjectHelper.formatKeys(data);
-    res.send(data);
+    else {
+      const filters = req.query;
+      const filteredUsers = data.filter((user) => {
+        let isValid = true;
+        for (key in filters) {
+          isValid = isValid && user[key] == filters[key];
+        }
+        return isValid;
+      });
+      if (!filteredUsers) {
+        res.status(500).send({
+          message: err.message || MessageTag.ERROR_OCCURRED,
+        });
+      }
+
+      data = ObjectHelper.formatKeys(filteredUsers);
+      res.send(data);
+    }
   });
 };
 
