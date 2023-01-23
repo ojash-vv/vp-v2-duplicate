@@ -15,6 +15,7 @@ const httpServer = http.createServer(app);
 const startServer = (port) => {
   app.use("*", cors());
   app.use("/api/v1/role/", roleRoute);
+  app.use("/api/v1/auth/", authRoute);
   httpServer.listen(port, () => {
     console.info(`Server is on ${port}`);
   });

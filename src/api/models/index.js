@@ -5,6 +5,7 @@ const db = {};
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.roleAndPermissions = require("./rolePermissions")(sequelize, DataTypes);
+db.auth = require("./auth")(sequelize, DataTypes);
 // fs.readdirSync(__dirname).forEach((file) => {
 //   if (!file.includes("index.js")) {
 //     const name = file.split(".")[0].toLocaleLowerCase();
