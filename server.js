@@ -2,7 +2,12 @@ const http = require("http");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { authRoute, roleRoute } = require("./src/api/routes/index");
+const {
+  authRoute,
+  roleRoute,
+  globalTypeCategory,
+  globalType,
+} = require("./src/api/routes/index");
 
 //middleware
 app.use(express.json());
@@ -16,6 +21,8 @@ const startServer = (port) => {
   app.use("*", cors());
   app.use("/api/v1/role/", roleRoute);
   app.use("/api/v1/auth/", authRoute);
+  app.use("/api/v1/globaltypecategory/", globalTypeCategory);
+  app.use("/api/v1/globaltype/", globalType);
   httpServer.listen(port, () => {
     console.info(`Server is on ${port}`);
   });

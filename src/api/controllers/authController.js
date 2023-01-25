@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const generateAccessToken = require("../controllers/generateAccessToken");
 const validator = require("validator");
 const { logger } = require("../../../logger");
+const MessageTag = require("../../enums/messageNums");
 
 const Auth = db.auth;
 
@@ -12,13 +13,15 @@ const loginUser = async (req, res) => {
 
   if (!isEmpty(loginAuth)) {
     const email = loginAuth?.email;
-    logger.warn({ user: email, msg: "Running login api" });
+    logger.warn(
+      { component: "auth --->", method: "loginUser --->" },
+      { user: email, msg: "Running login api" }
+    );
 
     const password = loginAuth?.password;
     try {
-      if (!email || !password) throw new Error("All fileds are required");
-      if (!validator.isEmail(email))
-        throw new Error("Please enter a valid email");
+      if (!email || !password) throw new Error(MessageTag.ALL_REQ);
+      if (!validator.isEmail(email)) throw new Error(MessageTag.ValidEmail);
       const isExists = await Auth.findOne({
         where: { userEmail: email },
       });
@@ -31,18 +34,26 @@ const loginUser = async (req, res) => {
             user: user,
             token: token,
             status: true,
-            message: "Welcome to Virtuevise Portal!",
+            message: MessageTag.WelcomeMsg,
           });
-          logger.info({
-            user: isExists,
-            msg: "Login successfully: " + email,
-          });
+          logger.info(
+            { component: "auth --->", method: "successLogin --->" },
+            {
+              user: isExists,
+              msg: "Login successfully: " + email,
+            }
+          );
         } else {
-          logger.error({
-            user: isExists,
-            msg: "Password Incrrect for user: " + email,
-          });
-          res.status(401).json({ status: false, error: "Password incorrect!" });
+          logger.error(
+            { component: "auth --->", method: "password --->" },
+            {
+              user: isExists,
+              msg: "Password Incrrect for user: " + email,
+            }
+          );
+          res
+            .status(401)
+            .json({ status: false, error: MessageTag.PasswordWrong });
         }
       }
     } catch (error) {
