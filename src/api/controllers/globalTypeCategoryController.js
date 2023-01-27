@@ -1,8 +1,8 @@
 const db = require("../models/index");
 const { isEmpty } = require("lodash");
-const { logger } = require("../../utils/logger");
+const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
-const ObjectHelper = require("../../utils");
+const ObjectHelper = require("../../helper");
 
 const GlobalTypeCategory = db.globalTypeCategory;
 

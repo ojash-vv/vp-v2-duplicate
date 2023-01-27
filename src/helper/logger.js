@@ -1,17 +1,6 @@
 const winston = require("winston");
 require("winston-daily-rotate-file");
 
-const mydate = new Date("MM DD, YYYY");
-let filename =
-  "logs/" +
-  mydate.getFullYear() +
-  "-" +
-  mydate.getMonth() +
-  "-" +
-  mydate.getDate() +
-  "-" +
-  "logs.log";
-//DailyRotateFile func()
 const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: "logs/Logs-%DATE%.log",
   datePattern: "YYYY-MM-DD",

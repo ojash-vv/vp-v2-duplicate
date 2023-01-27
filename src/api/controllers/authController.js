@@ -2,7 +2,7 @@ const db = require("../models/index");
 const { isEmpty } = require("lodash");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-const { logger } = require("../../utils/logger");
+const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
 
 const Auth = db.auth;
