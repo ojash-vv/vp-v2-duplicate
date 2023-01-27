@@ -1,12 +1,17 @@
 const db = require("../models/index");
 const { isEmpty } = require("lodash");
 const bcrypt = require("bcrypt");
-const generateAccessToken = require("../controllers/generateAccessToken");
 const validator = require("validator");
-const { logger } = require("../../../logger");
+const { logger } = require("../../utils/logger");
 const MessageTag = require("../../enums/messageNums");
 
 const Auth = db.auth;
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
+function generateAccessToken(user) {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+}
 
 const loginUser = async (req, res) => {
   const loginAuth = req?.body;

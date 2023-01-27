@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const GlobalTypeCategory = sequelize.define(
-    "GTC",
+    "GlobalTypeCategory",
     {
       uniqueValue: {
         type: DataTypes.STRING,

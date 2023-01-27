@@ -1,6 +1,6 @@
 const db = require("../models/index");
 const { isEmpty } = require("lodash");
-const { logger } = require("../../../logger");
+const { logger } = require("../../utils/logger");
 const MessageTag = require("../../enums/messageNums");
 const ObjectHelper = require("../../utils");
 
@@ -202,7 +202,7 @@ const updateGlobalType = async (req, res) => {
             msg: "Global type Category not exists.....",
           }
         );
-        res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
+        res.status(419).json({ status: false, error: MessageTag.GTC_NOT });
         return;
       }
 

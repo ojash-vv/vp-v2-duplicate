@@ -183,7 +183,7 @@ const deleteGlobalTypeCategory = async (req, res) => {
           msg: "Global type categoey not exists.....",
         }
       );
-      res.status(419).json({ status: false, error: MessageTag.GTC_NOT });
+      res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
       return;
     }
 
@@ -217,7 +217,7 @@ const deleteGlobalTypeCategory = async (req, res) => {
         msg: "Catch error: " + error?.message,
       }
     );
-    res.status(419).json({ status: false, error: error?.message });
+    res.status(400).json({ status: false, error: error?.message });
   }
 };
 
@@ -232,23 +232,21 @@ const getGlobalTypeCategory = async (req, res) => {
 
   try {
     const result = await GlobalTypeCategory.findAll();
-    if (result) {
-      res.status(200).send({
-        status: true,
-        message: MessageTag.GTC_LIST,
-        data: result,
-      });
-      logger.info(
-        {
-          component: "globalTypeCategory --->",
-          method: "getGlobalTypeCategory --->",
-        },
-        {
-          payload: null,
-          msg: "Global category List: ",
-        }
-      );
-    }
+    res.status(200).send({
+      status: true,
+      message: MessageTag.GTC_LIST,
+      data: result,
+    });
+    logger.info(
+      {
+        component: "globalTypeCategory --->",
+        method: "getGlobalTypeCategory --->",
+      },
+      {
+        payload: null,
+        msg: "Global category List: ",
+      }
+    );
   } catch (error) {
     logger.error(
       {
@@ -260,7 +258,7 @@ const getGlobalTypeCategory = async (req, res) => {
         msg: "Catch error: " + error?.message,
       }
     );
-    res.status(419).json({ status: false, error: error?.message });
+    res.status(400).json({ status: false, error: error?.message });
   }
 };
 
@@ -299,7 +297,7 @@ const updateStatusGlobalTypeCategory = async (req, res) => {
             msg: "Global type categoey not exists.....",
           }
         );
-        res.status(419).json({ status: false, error: MessageTag.GTC_NOT });
+        res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
         return;
       }
 
@@ -315,22 +313,20 @@ const updateStatusGlobalTypeCategory = async (req, res) => {
           },
         }
       );
-      if (result) {
-        res.status(200).send({
-          status: true,
-          message: MessageTag.GTC_UPDATE,
-        });
-        logger.info(
-          {
-            component: "globalTypeCategory --->",
-            method: "updateStatusGlobalTypeCategory --->",
-          },
-          {
-            data: isExists,
-            msg: "Global category updated,Id: " + id,
-          }
-        );
-      }
+      res.status(200).send({
+        status: true,
+        message: MessageTag.GTC_UPDATE,
+      });
+      logger.info(
+        {
+          component: "globalTypeCategory --->",
+          method: "updateStatusGlobalTypeCategory --->",
+        },
+        {
+          data: isExists,
+          msg: "Global category updated,Id: " + id,
+        }
+      );
     } catch (error) {
       logger.error(
         {
@@ -342,7 +338,7 @@ const updateStatusGlobalTypeCategory = async (req, res) => {
           msg: "Catch error: " + error?.message,
         }
       );
-      res.status(419).json({ status: false, error: error?.message });
+      res.status(400).json({ status: false, error: error?.message });
     }
   }
 };
