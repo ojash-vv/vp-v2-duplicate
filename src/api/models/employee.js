@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const RolePermissions = sequelize.define(
+  const Employee = sequelize.define(
     "Employee",
     {
       userId: {
@@ -31,5 +31,5 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "vp_users",
     }
   );
-  return RolePermissions;
+  return Employee;
 };
