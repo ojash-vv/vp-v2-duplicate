@@ -10,8 +10,6 @@ module.exports = (sequelize, DataTypes) => {
       moduleId: DataTypes.INTEGER,
       roleId: DataTypes.INTEGER,
       permissions: { type: DataTypes.JSON },
-      createdBy: DataTypes.STRING,
-      updatedBy: DataTypes.STRING,
       isDeleted: DataTypes.BOOLEAN,
     },
     {
