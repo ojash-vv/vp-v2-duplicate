@@ -7,6 +7,7 @@ const {
   roleRoute,
   globalTypeCategory,
   globalType,
+  employeeRoute,
 } = require("./src/api/routes/index");
 
 //middleware
@@ -23,6 +24,7 @@ const startServer = (port) => {
   app.use("/api/v1/auth/", authRoute);
   app.use("/api/v1/globaltypecategory/", globalTypeCategory);
   app.use("/api/v1/globaltype/", globalType);
+  app.use("/api/v1/employee", employeeRoute);
   httpServer.listen(port, () => {
     console.info(`Server is on ${port}`);
   });
