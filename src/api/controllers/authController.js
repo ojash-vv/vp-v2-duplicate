@@ -1,6 +1,6 @@
 const db = require("../models/index");
 const { isEmpty } = require("lodash");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
             message: MessageTag.WelcomeMsg,
           });
           logger.info(
-            { component: "auth --->", method: "successLogin --->" },
+            { component: "auth --->", method: "loginUser --->" },
             {
               user: isExists,
               msg: "Login successfully: " + email,
@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
           );
         } else {
           logger.error(
-            { component: "auth --->", method: "password --->" },
+            { component: "auth --->", method: "loginUser --->" },
             {
               user: isExists,
               msg: "Password Incrrect for user: " + email,
@@ -60,6 +60,17 @@ const loginUser = async (req, res) => {
             .status(401)
             .json({ status: false, error: MessageTag.PasswordWrong });
         }
+      } else {
+        logger.error(
+          { component: "auth --->", method: "loginUser --->" },
+          {
+            user: isExists,
+            msg: "User Not Found ,user: " + email,
+          }
+        );
+        res
+          .status(401)
+          .json({ status: false, error: MessageTag.NotFoundEmail });
       }
     } catch (error) {
       logger.error({
