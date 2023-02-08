@@ -6,5 +6,5 @@ const {
 } = require("../controllers/employeeController");
 
 router.get("/", getListOfEmployees);
-router.post("/update", updateEmployeeData);
+router.post("/", updateEmployeeData);
 module.exports = router;
