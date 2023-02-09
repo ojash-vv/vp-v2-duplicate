@@ -4,12 +4,13 @@ const router = express.Router();
 const {
   getListOfEmployees,
   updateEmployeeData,
+  addNewEmployee,
 } = require("../controllers/employeeController");
 const { markAttendance } = require("../controllers/attendanceController");
 
 router.get("/", getListOfEmployees);
-router.post("/", updateEmployeeData);
-// router.post("/update", updateEmployeeData);
+router.post("/", addNewEmployee);
+router.patch("/", updateEmployeeData);
 router.post("/markAttendance", markAttendance);
 
 module.exports = router;

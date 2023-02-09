@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       empMobileNumber: DataTypes.STRING,
       userBirthday: DataTypes.STRING,
       empJoinDate: DataTypes.DATE,
-      empSalary: DataTypes.DATE,
+      empSalary: DataTypes.STRING,
       empCurrentAddress: DataTypes.TEXT,
       empPermanentAddress: DataTypes.TEXT,
       userResetPasswordOtp: DataTypes.STRING,

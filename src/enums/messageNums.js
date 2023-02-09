@@ -23,6 +23,8 @@ const MessageTag = {
 
   ERROR_OCCURRED: "Some error occurred while creating record!",
   CONTENT_NOT_FOUND: "Content can not be empty!",
+  EMAIL_EXISTS: "Email already exists",
+  EMPLOYEE_ID_EXISTS: "Employee ID already exists",
 };
 
 module.exports = MessageTag;
