@@ -75,26 +75,34 @@ const updateEmployeeData = async (req, res) => {
       throw new NotFound(null, null, null, "User not found");
     }
 
-    const isUpdated = await Employee.create({
-      empId: empID,
-      userPersonalEmail: empPersonalEmail,
-      userEmail: empEmail,
-      userPassword: empPassword,
-      userDesignation: empDesignation,
-      userName: empName,
-      userRole: userRole,
-      userProfileImage: empProfileImage,
-      empMobileNumber: empMobileNumber,
-      userBirthday: empDob,
-      empJoinDate: empJoinDate,
-      empSalary: empSal,
-      empCurrentAddress: empCurrentAddress,
-      empPermanentAddress: empPermanentAddress,
-      createdAt: new Date(),
-      isActive: 1,
-    });
+    const isUpdated = await Employee.update(
+      {
+        empId: empID,
+        userPersonalEmail: empPersonalEmail,
+        userEmail: empEmail,
+        userPassword: empPassword,
+        userDesignation: empDesignation,
+        userName: empName,
+        userRole: userRole,
+        userProfileImage: empProfileImage,
+        empMobileNumber: empMobileNumber,
+        userBirthday: empDob,
+        empJoinDate: empJoinDate,
+        empSalary: empSal,
+        empCurrentAddress: empCurrentAddress,
+        empPermanentAddress: empPermanentAddress,
+        createdAt: new Date(),
+        isActive: 1,
+      },
+      {
+        where: {
+          userId: userId,
+        },
+        returning: true,
+      }
+    );
 
-    if (!isEmpty(isCreated)) {
+    if (!isEmpty(isUpdated)) {
       //  logger.warn(
       //    {
       //      component: "Employee --->",
@@ -105,7 +113,7 @@ const updateEmployeeData = async (req, res) => {
       res.status(200).json({
         status: true,
         message: "success",
-        data: isUpdated,
+        data: isUpdated[1][0],
         statusCode: HttpStatusCode.OK,
       });
     }
@@ -233,9 +241,70 @@ const addNewEmployee = async (req, res) => {
     });
   }
 };
+const deleteEmployee = async (req, res) => {
+  const { empID, userId } = req?.body;
+  try {
+    if (!empID || !userId) {
+      throw new BadRequest();
+    }
+
+    const isEmpIdExists = await Employee.findAll({
+      where: {
+        empId: empID,
+        userId: userId,
+        isDeleted: 0,
+      },
+    });
+    if (isEmpty(isEmpIdExists)) {
+      throw new NotFound();
+    }
+
+    const isDeleted = await Employee.update(
+      {
+        isDeleted: 1,
+      },
+      {
+        where: {
+          userId: userId,
+          empID: empID,
+        },
+        returning: true,
+      }
+    );
+    if (!isEmpty(isDeleted)) {
+      //  logger.warn(
+      //    {
+      //      component: "Employee --->",
+      //      method: "addEmployee --->",
+      //    },
+      //    { payload: displayName, msg: "Add new employee created successfully....." }
+      //  );
+      res.status(200).json({
+        status: true,
+        message: "success",
+        data: isDeleted[1][0],
+        statusCode: HttpStatusCode.OK,
+      });
+    }
+  } catch (error) {
+    if (error?.httpCode) {
+      res.status(error?.httpCode).json({
+        status: error?.isOperational,
+        message: error?.message,
+        statusCode: error?.httpCode,
+      });
+    }
+    res.status(HttpStatusCode.INTERNAL_SERVER).json({
+      status: false,
+      message: error?.message,
+      statusCode: HttpStatusCode.INTERNAL_SERVER,
+    });
+  }
+};
 
 module.exports = {
   getListOfEmployees,
   updateEmployeeData,
   addNewEmployee,
+  deleteEmployee,
 };

@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         type: "TIMESTAMP",
       },
       isActive: DataTypes.TINYINT,
+      isDeleted: DataTypes.TINYINT,
       userLocked: DataTypes.INTEGER,
     },
     {
