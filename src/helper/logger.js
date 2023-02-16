@@ -1,5 +1,6 @@
 const winston = require("winston");
 require("winston-daily-rotate-file");
+const { colorize, combine, timestamp, printf } = winston.format;
 
 const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: "logs/Logs-%DATE%.log",
@@ -7,12 +8,16 @@ const fileRotateTransport = new winston.transports.DailyRotateFile({
   maxFiles: "14d",
 });
 
+const logFormat = printf(({ level, message, timestamp }) => {
+  return `//=> [${timestamp}] : [${level}] ${JSON.stringify(message)} `;
+});
 const logConfiguration = {
-  format: winston.format.combine(
-    winston.format.timestamp({
-      format: "YYYY-MM-DD HH:mm:ss",
+  format: combine(
+    colorize(),
+    timestamp({
+      format: "dd-MM-YYYY HH:mm:ss",
     }),
-    winston.format.json()
+    logFormat
   ),
   transports: [fileRotateTransport, new winston.transports.Console()],
 };
