@@ -1,4 +1,5 @@
 const { isEmpty } = require("lodash");
+const bcrypt = require("bcryptjs");
 const MessageTag = require("../../enums/messageNums");
 const db = require("../models/index");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
@@ -103,13 +104,7 @@ const updateEmployeeData = async (req, res) => {
     );
 
     if (!isEmpty(isUpdated)) {
-      //  logger.warn(
-      //    {
-      //      component: "Employee --->",
-      //      method: "addEmployee --->",
-      //    },
-      //    { payload: displayName, msg: "Add new employee created successfully....." }
-      //  );
+    
       res.status(200).json({
         status: true,
         message: "success",
@@ -191,12 +186,13 @@ const addNewEmployee = async (req, res) => {
         MessageTag.EMPLOYEE_ID_EXISTS
       );
     }
-
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(empPassword, salt);
     const isCreated = await Employee.create({
       empId: empID,
       userPersonalEmail: empPersonalEmail,
       userEmail: empEmail,
-      userPassword: empPassword,
+      userPassword: hashedPassword,
       userDesignation: empDesignation,
       userName: empName,
       userRole: userRole,
@@ -212,13 +208,6 @@ const addNewEmployee = async (req, res) => {
     });
 
     if (!isEmpty(isCreated)) {
-      //  logger.warn(
-      //    {
-      //      component: "Employee --->",
-      //      method: "addEmployee --->",
-      //    },
-      //    { payload: displayName, msg: "Add new employee created successfully....." }
-      //  );
       res.status(200).json({
         status: true,
         message: "success",
@@ -272,13 +261,6 @@ const deleteEmployee = async (req, res) => {
       }
     );
     if (!isEmpty(isDeleted)) {
-      //  logger.warn(
-      //    {
-      //      component: "Employee --->",
-      //      method: "addEmployee --->",
-      //    },
-      //    { payload: displayName, msg: "Add new employee created successfully....." }
-      //  );
       res.status(200).json({
         status: true,
         message: "success",
