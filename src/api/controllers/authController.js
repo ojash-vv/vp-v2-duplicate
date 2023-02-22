@@ -6,7 +6,10 @@ const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
 
 const Auth = db.auth;
+const RolePermissions = db.roleAndPermissions;
+const GlobalType = db.globalType;
 const jwt = require("jsonwebtoken");
+const { APIError } = require("../../helper/apiErros");
 require("dotenv").config();
 
 function generateAccessToken(user) {
@@ -33,16 +36,61 @@ const loginUser = async (req, res) => {
       if (!isEmpty(isExists)) {
         const hashedPassword = isExists.userPassword;
         const user = email;
-        if (await bcrypt.compare(password, hashedPassword)) {
+        const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+        if (isPasswordMatch) {
+          const userRoles = {};
           const token = generateAccessToken({ user: user });
+          const userRole = isExists?.userRole;
+          try {
+            const listOfPermissions = await RolePermissions.findAll({
+              where: {
+                roleId: userRole,
+              },
+            });
+            if (listOfPermissions?.length > 0) {
+              logger.info(
+                { component: "auth", method: "loginUser" },
+                {
+                  user: email,
+                  message: `permissions fetched successfully.Length of permissions are ${listOfPermissions?.length}`,
+                }
+              );
+              for (let i = 0; i < listOfPermissions.length; i++) {
+                const moduleId = listOfPermissions[i].moduleId;
+                const permissions = listOfPermissions[i].permissions;
+                const moduleName = await GlobalType.findOne({
+                  where: {
+                    id: moduleId,
+                    globalTypeCategory_uniqeValue: "modules",
+                  },
+                });
+                if (JSON.stringify(permissions)?.includes("all")) {
+                  userRoles[`${moduleName?.displayName}`] = "all";
+                } else {
+                  userRoles[`${moduleName?.displayName}`] =
+                    Object.keys(permissions)[0];
+                }
+              }
+            }
+          } catch (e) {
+            logger.error(
+              { component: "auth", method: "loginUser" },
+              {
+                user: email,
+                error: e,
+              }
+            );
+            throw new APIError();
+          }
           res.status(200).json({
             user: user,
             token: token,
+            userRoles,
             status: true,
             message: MessageTag.WelcomeMsg,
           });
           logger.info(
-            { component: "auth --->", method: "loginUser --->" },
+            { component: "auth", method: "loginUser" },
             {
               user: isExists,
               msg: "Login successfully: " + email,
@@ -53,7 +101,7 @@ const loginUser = async (req, res) => {
             { component: "auth --->", method: "loginUser --->" },
             {
               user: isExists,
-              msg: "Password Incrrect for user: " + email,
+              msg: "Password Incorrect for user: " + email,
             }
           );
           res
