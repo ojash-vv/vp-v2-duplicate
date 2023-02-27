@@ -13,6 +13,7 @@ const {
   getEmployeeDsr,
   getSingleEmployeeDsr,
   updateEmployeeDsr,
+  // filterEmployeeDsr,
 } = require("../controllers/employeeDsrController");
 
 router.get("/", getListOfEmployees);
@@ -24,7 +25,7 @@ router.post("/markAttendance", markAttendance);
 /*------employDsr route-----------*/
 router.post("/employeeDsr", employeeDsr);
 router.get("/getEmployeeDsr", getEmployeeDsr);
-router.get("/getSingleEmployeeDsr/:id", getSingleEmployeeDsr);
-router.patch("/updateEmployeeDsr/:id", updateEmployeeDsr);
-
+router.get("/getSingleEmployeeDsr", getSingleEmployeeDsr);
+router.patch("/updateEmployeeDsr", updateEmployeeDsr);
+// router.get("/filterEmployeeDsr", filterEmployeeDsr);
 module.exports = router;

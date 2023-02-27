@@ -1,33 +1,41 @@
 const db = require("../models/index");
+const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
 const employee = db.employeeDsr;
-
+const HttpStatusCode = require("../../enums/httpErrorCodes");
+const { BadRequest, NotFound } = require("../../helper/apiErros");
 const employeeDsr = async (req, res) => {
-  const createEmployeeDsr = req?.body;
+  const employeeDSRdata = req?.body;
+  const empId = employeeDSRdata.empId;
   try {
+    if (!employeeDSRdata) {
+      throw new BadRequest();
+    }
     let isCreated;
-    for (let i = 0; i < createEmployeeDsr.length; i++) {
-      const result = createEmployeeDsr[i];
+    for (let i = 0; i < employeeDSRdata.length; i++) {
+      const data = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: result.empId,
-        projectId: result.projectId,
-        workingDate: result.workingDate,
-        workingHours: result.workingHours,
-        taskDetail: result.taskDetail,
-        taskStatus: result.taskStatus,
-        taskMinutes: result.taskMinutes,
+        empId: data.empId,
+        projectId: data.projectId,
+        workingDate: data.workingDate,
+        workingHours: data.workingHours,
+        taskDetail: data.taskDetail,
+        taskStatus: data.taskStatus,
+        taskMinutes: data.taskMinutes,
         createdBy: "1",
         createdAt: new Date(),
       });
     }
-    res.status(200).json({ status: true, message: "success", data: isCreated });
+    res
+      .status(HttpStatusCode.OK)
+      .json({ status: true, message: "success", data: isCreated });
     logger.info(
       {
         component: "employeeDsr --->",
         method: "addemployeeDsr --->",
       },
       {
-        payload: null,
+        payload: isCreated,
         msg: "employeeDsr added",
       }
     );
@@ -38,22 +46,26 @@ const employeeDsr = async (req, res) => {
         method: "addemployeeDsr --->",
       },
       {
-        payload: null,
+        empId: "employeeId" + empId,
         msg: "Catch error: " + error?.message,
       }
     );
-    return res.status(400).json({ error: error?.message });
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message });
   }
 };
 
 const getEmployeeDsr = async (req, res) => {
+  const { empId } = req?.body;
   try {
-    const result = await employee.findAll();
-    if (result) {
-      res.status(200).json({
+    const isExists = await employee.findAll();
+    if (isEmpty(isExists)) {
+      throw new NotFound();
+    }
+    if (isExists) {
+      res.status(HttpStatusCode.OK).json({
         status: true,
         message: "success",
-        data: result,
+        data: isExists,
       });
       logger.info(
         {
@@ -61,7 +73,7 @@ const getEmployeeDsr = async (req, res) => {
           method: "getEmployeeDsr --->",
         },
         {
-          payload: null,
+          empId: "employeeId" + empId,
           msg: "employeeDsr data ",
         }
       );
@@ -73,25 +85,32 @@ const getEmployeeDsr = async (req, res) => {
         method: "getEmployeeDsr --->",
       },
       {
-        payload: null,
+        empId: "employeeId" + empId,
         msg: "Catch error: " + error?.message,
       }
     );
-    res.status(400).json({ message: error?.message });
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
   }
 };
 
 const getSingleEmployeeDsr = async (req, res) => {
-  const { id } = req?.params;
+  const { id, empId } = req?.body;
+
   try {
-    const result = await employee.findOne({
+    if (!id) {
+      throw new BadRequest();
+    }
+    const isExists = await employee.findOne({
       where: {
         id: id,
       },
     });
-    res.status(200).send({
+    if (isEmpty(isExists)) {
+      throw new NotFound();
+    }
+    res.status(HttpStatusCode.OK).send({
       status: true,
-      data: result,
+      data: isExists,
       message: "success",
     });
     logger.info(
@@ -100,12 +119,10 @@ const getSingleEmployeeDsr = async (req, res) => {
         method: "getSingleEmployeeDsr---------->",
       },
       {
-        payload: result,
-        msg: "EmployeeDsr Id: " + id,
+        empId: "employeeId" + empId,
+        msg: "EmployeeDsr data" + empId,
       }
     );
-
-    res.status(400).json({ message: "user doesn't exist" });
   } catch (error) {
     logger.error(
       {
@@ -113,17 +130,19 @@ const getSingleEmployeeDsr = async (req, res) => {
         method: "getSingleEmployeeDsr---------->",
       },
       {
-        payload: result,
+        empId: "employId" + empId,
         msg: "Catch error:" + error?.message,
       }
     );
-    res.status(400).json({ message: "user doesn't exist" });
+    res
+      .status(HttpStatusCode?.BAD_REQUEST)
+      .json({ message: "user doesn't exist" });
   }
 };
 
 const updateEmployeeDsr = async (req, res) => {
-  const { id } = req?.params;
   const {
+    id,
     empId,
     projectId,
     workingDate,
@@ -133,47 +152,59 @@ const updateEmployeeDsr = async (req, res) => {
     taskMinutes,
   } = req?.body;
   try {
+    if (
+      !id ||
+      !empId ||
+      !projectId ||
+      !workingDate ||
+      !workingHours ||
+      !taskDetail ||
+      !taskStatus ||
+      !taskMinutes
+    ) {
+      throw new BadRequest();
+    }
     const isExists = await employee.findOne({
       where: {
         id: id,
       },
     });
-    if (isExists) {
-      const result = await employee.update(
-        {
-          empId: empId,
-          projectId: projectId,
-          workingDate: workingDate,
-          workingHours: workingHours,
-          taskDetail: taskDetail,
-          taskStatus: taskStatus,
-          taskMinutes: taskMinutes,
-          updatedBy: "1",
-          updatedAt: new Date(),
-        },
-        {
-          where: {
-            id: id,
-          },
-        }
-      );
-      res.status(200).send({
-        status: true,
-        message: "updated successfully",
-      });
-      logger.info(
-        {
-          compound: "EmployeeDsr------->",
-          method: "updateEmployeeDsr---------->",
-        },
-        {
-          payload: result,
-          msg: "EmployeeDsr updated,Id: " + id,
-        }
-      );
-    } else {
-      res.status(400).json({ message: "user doesn't exist" });
+    if (isEmpty(isExists)) {
+      throw new NotFound();
     }
+    const isUpdated = await employee.update(
+      {
+        empId: empId,
+        projectId: projectId,
+        workingDate: workingDate,
+        workingHours: workingHours,
+        taskDetail: taskDetail,
+        taskStatus: taskStatus,
+        taskMinutes: taskMinutes,
+        updatedBy: "1",
+        updatedAt: new Date(),
+      },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    res.status(HttpStatusCode.OK).send({
+      status: true,
+      message: "updated successfully",
+      data: isUpdated,
+    });
+    logger.info(
+      {
+        compound: "EmployeeDsr------->",
+        method: "updateEmployeeDsr---------->",
+      },
+      {
+        payload: isUpdated,
+        msg: "EmployeeDsr updated,employeeId: " + empId,
+      }
+    );
   } catch (error) {
     logger.error(
       {
@@ -181,11 +212,11 @@ const updateEmployeeDsr = async (req, res) => {
         method: "updateEmployeeDsr---------->",
       },
       {
-        payload: null,
+        empId: "employeeId" + empId,
         msg: "Catch error:" + error?.message,
       }
     );
-    res.status(400).json({ message: error?.messages });
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });
   }
 };
 
