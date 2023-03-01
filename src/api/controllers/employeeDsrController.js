@@ -4,6 +4,7 @@ const { logger } = require("../../helper/logger");
 const employee = db.employeeDsr;
 const HttpStatusCode = require("../../enums/httpErrorCodes");
 const { BadRequest, NotFound } = require("../../helper/apiErros");
+const { Op } = require("sequelize");
 const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;
   const empId = employeeDSRdata.empId;
@@ -13,15 +14,15 @@ const employeeDsr = async (req, res) => {
     }
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
-      const data = employeeDSRdata[i];
+      const createEmployeeDsr = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: data.empId,
-        projectId: data.projectId,
-        workingDate: data.workingDate,
-        workingHours: data.workingHours,
-        taskDetail: data.taskDetail,
-        taskStatus: data.taskStatus,
-        taskMinutes: data.taskMinutes,
+        empId: createEmployeeDsr.empId,
+        projectId: createEmployeeDsr.projectId,
+        workingDate: createEmployeeDsr.workingDate,
+        workingHours: createEmployeeDsr.workingHours,
+        taskDetail: createEmployeeDsr.taskDetail,
+        taskStatus: createEmployeeDsr.taskStatus,
+        taskMinutes: createEmployeeDsr.taskMinutes,
         createdBy: "1",
         createdAt: new Date(),
       });
@@ -57,7 +58,10 @@ const employeeDsr = async (req, res) => {
 const getEmployeeDsr = async (req, res) => {
   const { empId } = req?.body;
   try {
-    const isExists = await employee.findAll();
+    if (!empId) {
+      throw new BadRequest();
+    }
+    const isExists = await employee.findAll({ order: [["id", "DESC"]] });
     if (isEmpty(isExists)) {
       throw new NotFound();
     }
@@ -97,7 +101,7 @@ const getSingleEmployeeDsr = async (req, res) => {
   const { id, empId } = req?.body;
 
   try {
-    if (!id) {
+    if (!id || !empId) {
       throw new BadRequest();
     }
     const isExists = await employee.findOne({
@@ -115,7 +119,7 @@ const getSingleEmployeeDsr = async (req, res) => {
     });
     logger.info(
       {
-        compound: "EmployeeDsr------->",
+        component: "EmployeeDsr------->",
         method: "getSingleEmployeeDsr---------->",
       },
       {
@@ -126,7 +130,7 @@ const getSingleEmployeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        compound: "EmployeeDsr------->",
+        component: "EmployeeDsr------->",
         method: "getSingleEmployeeDsr---------->",
       },
       {
@@ -197,7 +201,7 @@ const updateEmployeeDsr = async (req, res) => {
     });
     logger.info(
       {
-        compound: "EmployeeDsr------->",
+        component: "EmployeeDsr------->",
         method: "updateEmployeeDsr---------->",
       },
       {
@@ -208,7 +212,7 @@ const updateEmployeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        compound: "EmployeeDsr------->",
+        component: "EmployeeDsr------->",
         method: "updateEmployeeDsr---------->",
       },
       {
@@ -220,9 +224,80 @@ const updateEmployeeDsr = async (req, res) => {
   }
 };
 
+const filterEmployeeDsr = async (req, res) => {
+  const { taskDetail, startDate, endDate, empId } = req?.body;
+  try {
+    if (taskDetail && startDate && endDate) {
+      var isExists = await employee.findAll({
+        where: {
+          taskDetail: taskDetail,
+          workingDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        offset: 1,
+        limit: 5,
+      });
+    } else if (taskDetail) {
+      var isExists = await employee.findAll({
+        where: {
+          taskDetail: taskDetail,
+        },
+        offset: 1,
+        limit: 5,
+      });
+    } else if (startDate && endDate) {
+      var isExists = await employee.findAll({
+        where: {
+          workingDate: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        offset: 1,
+        limit: 5,
+      });
+    }
+
+    if (isEmpty(isExists)) {
+      throw new NotFound();
+    }
+    res.status(HttpStatusCode?.OK).json({
+      status: true,
+      message: "success",
+      data: isExists,
+    });
+    logger.info(
+      {
+        component: "employeeDsr",
+        method: "find taskDetail in employeeDsr",
+      },
+      {
+        payload: "employeeId" + empId,
+        msg: "taskDetail " + taskDetail,
+      }
+    );
+  } catch (error) {
+    logger.error(
+      {
+        component: "employeeDsr",
+        method: "find taskDetail in employeeDsr",
+      },
+      {
+        payload: "employeeId" + empId,
+        msg: "Catch error " + error?.message,
+      }
+    );
+    res.status(HttpStatusCode?.BAD_REQUEST).json({
+      status: false,
+      message: error?.message,
+    });
+  }
+};
+
 module.exports = {
   employeeDsr,
   getEmployeeDsr,
   getSingleEmployeeDsr,
   updateEmployeeDsr,
+  filterEmployeeDsr,
 };
