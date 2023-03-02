@@ -1,8 +1,11 @@
 const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize("virtuevi_vp", "root", "", {
-  host: "localhost",
-  dialect: "mysql",
+const dbConfig =
+  process.env.NODE_ENV === "development"
+    ? process.env.LOCAL_DB_URI
+    : process.env.PROD_DB_URI;
+
+const sequelize = new Sequelize(dbConfig, {
   pool: { min: 0, max: 5, idle: 10000 },
 });
 

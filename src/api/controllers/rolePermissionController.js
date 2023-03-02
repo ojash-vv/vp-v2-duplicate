@@ -59,7 +59,7 @@ const getPermissionsByRoleId = async (req, res) => {
   if (roleId) {
     try {
       const permissionsByRoleId = await RolePermissions.findAll({
-        where: { roleId: roleId },
+        where: { roleId: Number(roleId) },
       });
       if (permissionsByRoleId.length > 0) {
         res.json({
