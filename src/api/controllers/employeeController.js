@@ -104,12 +104,10 @@ const updateEmployeeData = async (req, res) => {
     );
 
     if (!isEmpty(isUpdated)) {
-    
       res.status(200).json({
         status: true,
         message: "success",
-        data: isUpdated[1][0],
-        statusCode: HttpStatusCode.OK,
+        data: isUpdated,
       });
     }
   } catch (error) {
