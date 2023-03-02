@@ -13,7 +13,6 @@ const logFormat = printf(({ level, message, timestamp }) => {
 });
 const logConfiguration = {
   format: combine(
-    // colorize(),
     timestamp({
       format: "dd-MM-YYYY HH:mm:ss",
     }),

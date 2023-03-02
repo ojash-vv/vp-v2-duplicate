@@ -14,15 +14,15 @@ const employeeDsr = async (req, res) => {
     }
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
-      const createEmployeeDsr = employeeDSRdata[i];
+      const currentEmployeeDSR = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: createEmployeeDsr.empId,
-        projectId: createEmployeeDsr.projectId,
-        workingDate: createEmployeeDsr.workingDate,
-        workingHours: createEmployeeDsr.workingHours,
-        taskDetail: createEmployeeDsr.taskDetail,
-        taskStatus: createEmployeeDsr.taskStatus,
-        taskMinutes: createEmployeeDsr.taskMinutes,
+        empId: currentEmployeeDSR.empId,
+        projectId: currentEmployeeDSR.projectId,
+        workingDate: currentEmployeeDSR.workingDate,
+        workingHours: currentEmployeeDSR.workingHours,
+        taskDetail: currentEmployeeDSR.taskDetail,
+        taskStatus: currentEmployeeDSR.taskStatus,
+        taskMinutes: currentEmployeeDSR.taskMinutes,
         createdBy: "1",
         createdAt: new Date(),
       });
@@ -32,8 +32,8 @@ const employeeDsr = async (req, res) => {
       .json({ status: true, message: "success", data: isCreated });
     logger.info(
       {
-        component: "employeeDsr --->",
-        method: "addemployeeDsr --->",
+        controller: "employeeDsrController --->",
+        method: "employeeDsr --->",
       },
       {
         payload: isCreated,
@@ -43,8 +43,8 @@ const employeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "employeeDsr --->",
-        method: "addemployeeDsr --->",
+        controller: "employeeDsrController --->",
+        method: "employeeDsr --->",
       },
       {
         empId: "employeeId" + empId,
@@ -73,7 +73,7 @@ const getEmployeeDsr = async (req, res) => {
       });
       logger.info(
         {
-          component: "employeeDsr --->",
+          controller: "employeeDsrController --->",
           method: "getEmployeeDsr --->",
         },
         {
@@ -85,7 +85,7 @@ const getEmployeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "employeeDsr --->",
+        controller: "employeeDsrController --->",
         method: "getEmployeeDsr --->",
       },
       {
@@ -119,7 +119,7 @@ const getSingleEmployeeDsr = async (req, res) => {
     });
     logger.info(
       {
-        component: "EmployeeDsr------->",
+        controller: "employeeDsrController --->",
         method: "getSingleEmployeeDsr---------->",
       },
       {
@@ -130,11 +130,11 @@ const getSingleEmployeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "EmployeeDsr------->",
+        controller: "employeeDsrController --->",
         method: "getSingleEmployeeDsr---------->",
       },
       {
-        empId: "employId" + empId,
+        empId: "employId: " + empId,
         msg: "Catch error:" + error?.message,
       }
     );
@@ -201,7 +201,7 @@ const updateEmployeeDsr = async (req, res) => {
     });
     logger.info(
       {
-        component: "EmployeeDsr------->",
+        controller: "employeeDsrController --->",
         method: "updateEmployeeDsr---------->",
       },
       {
@@ -212,11 +212,11 @@ const updateEmployeeDsr = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "EmployeeDsr------->",
+        controller: "employeeDsrController --->",
         method: "updateEmployeeDsr---------->",
       },
       {
-        empId: "employeeId" + empId,
+        empId: "employeeId:" + empId,
         msg: "Catch error:" + error?.message,
       }
     );
@@ -268,23 +268,23 @@ const filterEmployeeDsr = async (req, res) => {
     });
     logger.info(
       {
-        component: "employeeDsr",
+        controller: "employeeDsrController --->",
         method: "find taskDetail in employeeDsr",
       },
       {
-        payload: "employeeId" + empId,
-        msg: "taskDetail " + taskDetail,
+        payload: "employeeId:" + empId,
+        msg: "taskDetail :" + taskDetail,
       }
     );
   } catch (error) {
     logger.error(
       {
-        component: "employeeDsr",
+        controller: "employeeDsrController --->",
         method: "find taskDetail in employeeDsr",
       },
       {
-        payload: "employeeId" + empId,
-        msg: "Catch error " + error?.message,
+        payload: "employeeId: " + empId,
+        msg: "Catch error: " + error?.message,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({

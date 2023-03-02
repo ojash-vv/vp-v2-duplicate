@@ -110,7 +110,4 @@ dist
 .package-lock.json
 package-lock.json
 
-#web config
-./web.config
-
 
