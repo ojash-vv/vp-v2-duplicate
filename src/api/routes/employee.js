@@ -6,6 +6,7 @@ const {
   updateEmployeeData,
   addNewEmployee,
   deleteEmployee,
+  getNewEmpId,
 } = require("../controllers/employeeController");
 const { markAttendance } = require("../controllers/attendanceController");
 const {
@@ -16,11 +17,13 @@ const {
   filterEmployeeDsr,
 } = require("../controllers/employeeDsrController");
 
+/*------employee list route-----------*/
 router.get("/", getListOfEmployees);
 router.post("/", addNewEmployee);
 router.patch("/", updateEmployeeData);
-router.delete("/", deleteEmployee);
+router.delete("/:userId/:empId", deleteEmployee);
 router.post("/markAttendance", markAttendance);
+router.get("/getNewEmpId", getNewEmpId);
 
 /*------employDsr route-----------*/
 router.post("/employeeDsr", employeeDsr);
