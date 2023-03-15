@@ -17,7 +17,7 @@ const employeeDsr = async (req, res) => {
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: currentEmployeeDSR.empId,
+        empId: currentEmployeeDSR.empId.toUpperCase(),
         projectId: currentEmployeeDSR.projectId,
         workingDate: currentEmployeeDSR.workingDate,
         workingHours: currentEmployeeDSR.workingHours,

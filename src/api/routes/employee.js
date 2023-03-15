@@ -16,7 +16,7 @@ const {
   filterEmployeeDsr,
 } = require("../controllers/employeeDsrController");
 const {
-  attendanceRecord,
+  getAttendanceRecord,
   allEmployeeAttendance,
 } = require("../controllers/attendanceRecordController");
 router.get("/", getListOfEmployees);
@@ -33,6 +33,6 @@ router.patch("/update-EmployeeDsr", updateEmployeeDsr);
 router.get("/filter-EmployeeDsr", filterEmployeeDsr);
 
 /*----------------attendanceRecord----------------*/
-router.get("/attendance-record", attendanceRecord);
+router.get("/attendance-record", getAttendanceRecord);
 router.get("/allattendance-record", allEmployeeAttendance);
 module.exports = router;

@@ -6,15 +6,25 @@ const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
 const employee = db.AttendenceRecord;
-
-const attendanceRecord = async (req, res) => {
-  const employeeNewArr = [];
+const username = db.employee;
+const getWeekEnd = (daysInMonth, month, year) => {
+  const weekends = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day, 12, 0, 0);
+    if (date.getDay() === 0 || date.getDay() === 6) {
+      weekends.push(date);
+    }
+  }
+  return weekends;
+};
+const getAttendanceRecord = async (req, res) => {
+  const employeeAttendanceRecord = [];
   const { year, empId } = req?.query;
   try {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const isExist = await employee.findAll({
+    const findAttendanceRecord = await employee.findAll({
       where: {
         empId: empId,
         createdAt: {
@@ -22,23 +32,17 @@ const attendanceRecord = async (req, res) => {
         },
       },
     });
-    if (isEmpty(isExist)) {
+    if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
     }
     for (let i = 0; i < 12; i++) {
-      const newAttendance = isExist.filter(
+      const newAttendance = findAttendanceRecord.filter(
         (data) => new Date(data.createdAt).getMonth() === i
       );
       const month = monthNames[i];
       const daysInMonth = new Date(year, i + 1, 0).getDate();
-      const weekends = [];
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, i, day, 12, 0, 0);
-        if (date.getDay() === 0 || date.getDay() === 6) {
-          weekends.push(date);
-        }
-      }
-      const weekdaysInMonth = daysInMonth - weekends.length;
+      const weekendsDaysInMonth = getWeekEnd(daysInMonth, i, year);
+      const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
       const employeePresentDays = newAttendance.length;
 
       if (weekdaysInMonth || employeePresentDays) {
@@ -49,15 +53,17 @@ const attendanceRecord = async (req, res) => {
           presenDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         };
-        employeeNewArr.push(employeeData);
+        employeeAttendanceRecord.push(employeeData);
       }
     }
-    res
-      .status(HttpStatusCode?.OK)
-      .json({ status: true, message: "success", data: employeeNewArr });
+    res.status(HttpStatusCode?.OK).json({
+      status: true,
+      message: "success",
+      data: employeeAttendanceRecord,
+    });
     logger.info(
       {
-        component: "attendanceRecord",
+        controller: "attendanceRecord",
         method: "get employee attendanceRecord",
       },
       {
@@ -68,7 +74,7 @@ const attendanceRecord = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "attendanceRecord",
+        controller: "attendanceRecord",
         method: "get employee attendanceRecord",
       },
       {
@@ -80,13 +86,13 @@ const attendanceRecord = async (req, res) => {
   }
 };
 const allEmployeeAttendance = async (req, res) => {
-  const employeeNewArr = [];
+  const employeeAttendanceRecord = [];
   const { year, empId, skip = 0, limit = 0 } = req?.query;
   try {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const isExist = await employee.findAll({
+    const findAllAttendanceRecord = await employee.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -95,13 +101,12 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
-    console.log(isExist);
-    if (isEmpty(isExist)) {
+    if (isEmpty(findAllAttendanceRecord)) {
       throw new NotFound();
     }
     const processedIds = {};
-    for (let i = 0; i < isExist.length; i++) {
-      const empId = isExist[i].empId;
+    for (let i = 0; i < findAllAttendanceRecord.length; i++) {
+      const empId = findAllAttendanceRecord[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
         const currentEmployeeData = {
@@ -109,22 +114,15 @@ const allEmployeeAttendance = async (req, res) => {
           data: [],
         };
         for (let j = 0; j < 12; j++) {
-          const newAttendance = isExist.filter(
+          const newAttendance = findAllAttendanceRecord.filter(
             (data) =>
               data.empId === empId && new Date(data.createdAt).getMonth() === j
           );
           const month = monthNames[j];
           const daysInMonth = new Date(year, j + 1, 0).getDate();
-          const weekends = [];
-          for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, j, day, 12, 0, 0);
-            if (date.getDay() === 0 || date.getDay() === 6) {
-              weekends.push(date);
-            }
-          }
-          const weekdaysInMonth = daysInMonth - weekends.length;
+          const weekendsDaysInMonth = getWeekEnd(daysInMonth, j, year);
+          const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
           const employeePresentDays = newAttendance.length;
-
           if (weekdaysInMonth || employeePresentDays) {
             currentEmployeeData.data.push({
               month: month,
@@ -133,17 +131,17 @@ const allEmployeeAttendance = async (req, res) => {
             });
           }
         }
-        employeeNewArr.push(currentEmployeeData);
+        employeeAttendanceRecord.push(currentEmployeeData);
       }
     }
     res.status(HttpStatusCode.OK).json({
       status: true,
       message: "success",
-      data: employeeNewArr,
+      data: employeeAttendanceRecord,
     });
     logger.info(
       {
-        component: "attendanceRecord",
+        controller: "attendanceRecord",
         method: "get all employee attendanceRecord",
       },
       {
@@ -154,7 +152,7 @@ const allEmployeeAttendance = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "attendanceRecord",
+        controller: "attendanceRecord",
         method: "get all employee attendanceRecord",
       },
       {
@@ -170,6 +168,6 @@ const allEmployeeAttendance = async (req, res) => {
   }
 };
 module.exports = {
-  attendanceRecord,
+  getAttendanceRecord,
   allEmployeeAttendance,
 };
