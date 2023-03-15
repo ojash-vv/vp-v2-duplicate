@@ -10,13 +10,14 @@ const employeeDsr = async (req, res) => {
   const empId = employeeDSRdata.empId;
   try {
     if (!employeeDSRdata) {
+      0;
       throw new BadRequest();
     }
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: currentEmployeeDSR.empId,
+        empId: currentEmployeeDSR.empId.toUpperCase(),
         projectId: currentEmployeeDSR.projectId,
         workingDate: currentEmployeeDSR.workingDate,
         workingHours: currentEmployeeDSR.workingHours,
@@ -48,7 +49,7 @@ const employeeDsr = async (req, res) => {
       },
       {
         empId: "employeeId" + empId,
-        msg: "Catch error: " + error?.message,
+        msg: "Catch error: " + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message });
@@ -56,12 +57,16 @@ const employeeDsr = async (req, res) => {
 };
 
 const getEmployeeDsr = async (req, res) => {
-  const { empId } = req?.body;
+  const { skip = 0, limit = 0, empId } = req?.query;
   try {
     if (!empId) {
       throw new BadRequest();
     }
-    const isExists = await employee.findAll({ order: [["id", "DESC"]] });
+    const isExists = await employee.findAll({
+      offset: parseInt(skip),
+      limit: parseInt(limit),
+    });
+
     if (isEmpty(isExists)) {
       throw new NotFound();
     }
@@ -90,7 +95,7 @@ const getEmployeeDsr = async (req, res) => {
       },
       {
         empId: "employeeId" + empId,
-        msg: "Catch error: " + error?.message,
+        msg: "Catch error: " + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -98,8 +103,7 @@ const getEmployeeDsr = async (req, res) => {
 };
 
 const getSingleEmployeeDsr = async (req, res) => {
-  const { id, empId } = req?.body;
-
+  const { id, empId } = req?.query;
   try {
     if (!id || !empId) {
       throw new BadRequest();
@@ -135,7 +139,7 @@ const getSingleEmployeeDsr = async (req, res) => {
       },
       {
         empId: "employId: " + empId,
-        msg: "Catch error:" + error?.message,
+        msg: "Catch error:" + error?.msg,
       }
     );
     res
@@ -217,7 +221,7 @@ const updateEmployeeDsr = async (req, res) => {
       },
       {
         empId: "employeeId:" + empId,
-        msg: "Catch error:" + error?.message,
+        msg: "Catch error:" + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });
@@ -225,36 +229,47 @@ const updateEmployeeDsr = async (req, res) => {
 };
 
 const filterEmployeeDsr = async (req, res) => {
-  const { taskDetail, startDate, endDate, empId } = req?.body;
+  const {
+    skip = 0,
+    limit = 0,
+    empId,
+    taskDetail,
+    startDate,
+    endDate,
+  } = req?.query;
+
   try {
+    if (!empId) {
+      throw new BadRequest();
+    }
     if (taskDetail && startDate && endDate) {
       var isExists = await employee.findAll({
+        offset: parseInt(skip),
+        limit: parseInt(limit),
         where: {
           taskDetail: taskDetail,
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-        offset: 1,
-        limit: 5,
       });
     } else if (taskDetail) {
       var isExists = await employee.findAll({
+        offset: parseInt(skip),
+        limit: parseInt(limit),
         where: {
           taskDetail: taskDetail,
         },
-        offset: 1,
-        limit: 5,
       });
     } else if (startDate && endDate) {
       var isExists = await employee.findAll({
+        offset: parseInt(skip),
+        limit: parseInt(limit),
         where: {
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-        offset: 1,
-        limit: 5,
       });
     }
 
@@ -284,7 +299,7 @@ const filterEmployeeDsr = async (req, res) => {
       },
       {
         payload: "employeeId: " + empId,
-        msg: "Catch error: " + error?.message,
+        msg: "Catch error: " + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({

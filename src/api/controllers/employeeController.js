@@ -14,6 +14,7 @@ const getListOfEmployees = async (req, res) => {
       offset: parseInt(skip),
       limit: parseInt(limit),
     });
+
     const totalEmpCount = await Employee.findAll({
       where: { userDesignation: "Employee" },
     });
