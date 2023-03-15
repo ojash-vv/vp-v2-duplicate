@@ -11,6 +11,9 @@ db.globalType = require("./globalType")(sequelize, DataTypes);
 db.employee = require("./employee")(sequelize, DataTypes);
 db.employeeAttendance = require("./attendance")(sequelize, DataTypes);
 db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
+db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
+db.AttendenceRecord = require("./AttendenceRecord")(sequelize, DataTypes);
+
 // fs.readdirSync(__dirname).forEach((file) => {
 //   if (!file.includes("index.js")) {
 //     const name = file.split(".")[0].toLocaleLowerCase();
@@ -18,7 +21,6 @@ db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
 //     sequelize, DataTypes;
 //   }
 // });
-
 sequelize.sync().then(() => {
   console.log("sync is done");
 });

@@ -69,7 +69,7 @@ const markLeave = async (req, res) => {
           msg: "Leave already marked.....",
         }
       );
-      res.status(400).json({ status: false, error: MessageTag.LeaveExist });
+      res.status(400).json({ status: false, error: MessageTag.LEAVE_EXIST });
       return;
     }
     const result = await EmployeeLeave.create({
@@ -87,7 +87,7 @@ const markLeave = async (req, res) => {
     data = ObjectHelper.formatKeys(result.dataValues);
     res.status(200).send({
       status: true,
-      message: MessageTag.LeaveMarked,
+      message: MessageTag.LEAVE_MARK,
       data: data,
     });
     logger.info(

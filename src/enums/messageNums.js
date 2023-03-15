@@ -25,13 +25,10 @@ const MessageTag = {
   ERROR_OCCURRED: "Some error occurred while creating record!",
   CONTENT_NOT_FOUND: "Content can not be empty!",
 
-  AttendanceAlreadyMarked: "Attendance already marked for this date.",
-  AttendanceMarked: "Attendance Marked.",
-  AttendanceNotMarked: "Attendance not marked for this date.",
-  TimeOutAlreadyMarked: "Time out already marked for the day.",
-
-  LeaveExist: "Leave already applied for this date.",
-  LeaveMarked: "Leave Marked!",
+  LEAVE_EXIST: "Leave already applied for this date.",
+  LEAVE_MARK: "Leave Marked!",
+  EMAIL_EXISTS: "Email already exists",
+  EMPLOYEE_ID_EXISTS: "Employee ID already exists",
 };
 
 module.exports = MessageTag;

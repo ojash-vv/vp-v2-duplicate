@@ -1,5 +1,10 @@
+const { isEmpty } = require("lodash");
+const bcrypt = require("bcryptjs");
+const MessageTag = require("../../enums/messageNums");
 const db = require("../models/index");
-
+const HttpStatusCode = require("../../enums/httpErrorCodes");
+const { APIError, BadRequest, NotFound } = require("../../helper/apiErros");
+const { logger } = require("../../helper/logger");
 const Employee = db.employee;
 
 const getListOfEmployees = async (req, res) => {
@@ -8,11 +13,8 @@ const getListOfEmployees = async (req, res) => {
     const employee = await Employee.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
-      where: { userDesignation: "Employee" },
     });
-    const totalEmpCount = await Employee.findAll({
-      where: { userDesignation: "Employee" },
-    });
+    const totalEmpCount = await Employee.findAll();
     if (employee) {
       res.status(200).json({
         status: true,
@@ -28,30 +30,339 @@ const getListOfEmployees = async (req, res) => {
   }
 };
 const updateEmployeeData = async (req, res) => {
-  const { userId, isActive } = req?.body;
+  const {
+    userId,
+    empId,
+    userName,
+    userPersonalEmail,
+    userEmail,
+    userPassword,
+    userDesignation,
+    userRole,
+    userProfileImg,
+    empMobileNumber,
+    empDob,
+    empJoinDate,
+    empSal,
+    empCurrentAddress,
+    empPermanentAddress,
+    isActive,
+  } = req?.body;
   try {
+    if (
+      !empId ||
+      !userName ||
+      !userPersonalEmail ||
+      !userEmail ||
+      !userPassword ||
+      !userDesignation ||
+      !userRole ||
+      // !userProfileImg ||
+      !empMobileNumber
+    ) {
+      logger.error(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "Bad request by the client",
+        }
+      );
+      throw new BadRequest();
+    }
+    const isExists = await Employee.findAll({
+      where: {
+        userId,
+      },
+    });
+
+    if (isEmpty(isExists)) {
+      logger.error(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "User not found",
+        }
+      );
+      throw new NotFound(null, null, null, "User not found");
+    }
+
     const isUpdated = await Employee.update(
-      { isActive: isActive },
       {
-        where: { userId: userId },
+        empId: empId,
+        userPersonalEmail: userPersonalEmail,
+        userEmail: userEmail,
+        userPassword: userPassword,
+        userDesignation: userDesignation,
+        userName: userName,
+        userRole: userRole,
+        userProfileImage: userProfileImg,
+        empMobileNumber: empMobileNumber,
+        userBirthday: empDob,
+        empJoinDate: empJoinDate,
+        empSalary: empSal,
+        empCurrentAddress: empCurrentAddress,
+        empPermanentAddress: empPermanentAddress,
+        updatedAt: new Date(),
+        isActive: isActive,
+      },
+      {
+        where: {
+          userId: userId,
+        },
+        returning: true,
       }
     );
-
-    if (isUpdated) {
+    let updatedUser = [];
+    if (isUpdated[1] === 1) {
+    }
+    updatedUser = await Employee.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (!isEmpty(isUpdated)) {
       res.status(200).json({
         status: true,
         message: "success",
+        data: updatedUser,
+      });
+      logger.info(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "Record updated successfully",
+        }
+      );
+    }
+  } catch (error) {
+    logger.error(
+      {
+        controller: "employeeController --->",
+        method: "updateEmployeeData --->",
+      },
+      {
+        payload: `Requested employee: ${userName} and employee id :${empId}`,
+        msg: `error:${error}`,
+      }
+    );
+    if (error?.httpCode) {
+      res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+        status: error?.isOperational || false,
+        message: error?.message,
+        statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+      });
+    }
+  }
+};
+const addNewEmployee = async (req, res) => {
+  const {
+    empID,
+    empName,
+    empPersonalEmail,
+    empEmail,
+    empPassword,
+    empDesignation,
+    userRole,
+    empProfileImage,
+    empMobileNumber,
+    empDob,
+    empJoinDate,
+    empSal,
+    empCurrentAddress,
+    empPermanentAddress,
+  } = req?.body;
+  try {
+    if (
+      !empID ||
+      !empName ||
+      !empPersonalEmail ||
+      !empEmail ||
+      !empPassword ||
+      !empDesignation ||
+      !userRole ||
+      !empMobileNumber ||
+      !empCurrentAddress ||
+      !empPermanentAddress
+    ) {
+      throw new BadRequest();
+    }
+    const isExists = await Employee.findAll({
+      where: {
+        userEmail: empEmail,
+      },
+    });
+    const isEmpIdExists = await Employee.findAll({
+      where: {
+        empId: empID,
+      },
+    });
+    if (!isEmpty(isExists)) {
+      throw new APIError(
+        "Conflict",
+        HttpStatusCode.CONFLICT,
+        false,
+        MessageTag.EMAIL_EXISTS
+      );
+    }
+    if (!isEmpty(isEmpIdExists)) {
+      throw new APIError(
+        "Conflict",
+        HttpStatusCode.CONFLICT,
+        false,
+        MessageTag.EMPLOYEE_ID_EXISTS
+      );
+    }
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(empPassword, salt);
+    const isCreated = await Employee.create({
+      empId: empID,
+      userPersonalEmail: empPersonalEmail,
+      userEmail: empEmail,
+      userPassword: hashedPassword,
+      userDesignation: empDesignation,
+      userName: empName,
+      userRole: userRole,
+      userProfileImage: empProfileImage,
+      empMobileNumber: empMobileNumber,
+      userBirthday: empDob,
+      empJoinDate: empJoinDate,
+      empSalary: empSal,
+      empCurrentAddress: empCurrentAddress,
+      empPermanentAddress: empPermanentAddress,
+      createdAt: new Date(),
+      isActive: 1,
+    });
+
+    if (!isEmpty(isCreated)) {
+      res.status(200).json({
+        status: true,
+        message: "success",
+        data: isCreated,
+        statusCode: HttpStatusCode.OK,
       });
     }
   } catch (error) {
-    res.status(400).json({
+    if (error?.httpCode) {
+      res.status(error?.httpCode).json({
+        status: error?.isOperational,
+        message: error?.message,
+        statusCode: error?.httpCode,
+      });
+    }
+    res.status(HttpStatusCode.INTERNAL_SERVER).json({
       status: false,
-      message: error,
+      message: error?.message,
+      statusCode: HttpStatusCode.INTERNAL_SERVER,
+    });
+  }
+};
+const deleteEmployee = async (req, res) => {
+  const { empId, userId } = req?.params;
+  try {
+    if (!empId || !userId) {
+      throw new BadRequest();
+    }
+
+    const isEmpIdExists = await Employee.findAll({
+      where: {
+        empId: empId,
+        userId: parseInt(userId),
+        isDeleted: 0,
+      },
+    });
+    if (isEmpty(isEmpIdExists)) {
+      throw new NotFound();
+    }
+
+    const isDeleted = await Employee.update(
+      {
+        isDeleted: 1,
+        isActive: 0,
+      },
+      {
+        where: {
+          userId: parseInt(userId),
+          empID: empId,
+        },
+        returning: true,
+      }
+    );
+    if (!isEmpty(isDeleted)) {
+      res.status(200).json({
+        status: true,
+        message: "success",
+        data: isDeleted[1][0],
+        statusCode: HttpStatusCode.OK,
+      });
+    }
+  } catch (error) {
+    res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+      status: error?.isOperational || false,
+      message: error?.message,
+      statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
     });
   }
 };
 
+const getNewEmpId = async (req, res) => {
+  try {
+    const lastRecord = await Employee.findOne({
+      order: [["userId", "DESC"]],
+    });
+    if (isEmpty(lastRecord)) {
+      throw new NotFound();
+    }
+    const { empId } = lastRecord;
+    const newEmpId = `VVT-${parseInt(empId.split("-")[1], 10) + 1}`;
+    res.status(200).json({
+      status: true,
+      message: "success",
+      data: newEmpId,
+      statusCode: HttpStatusCode.OK,
+    });
+    logger.info(
+      {
+        controller: "employeeController --->",
+        method: "getNewEmpId --->",
+      },
+      {
+        payload: null,
+        msg: "Record fetch and sent successfully",
+      }
+    );
+  } catch (error) {
+    // uncomment this error log once the emp id is attached on the api call headers
+
+    // logger.error(
+    //   {
+    //     controller: "employeeController --->",
+    //     method: "getNewEmpId --->",
+    //   },
+    //   {
+    //     payload: `Requested user: ${userName} and employee id :${empId}`,
+    //     msg: `error:${error}`,
+    //   }
+    // );
+    res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+      status: error?.isOperational || false,
+      message: error?.message,
+      statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+    });
+  }
+};
 module.exports = {
   getListOfEmployees,
   updateEmployeeData,
+  addNewEmployee,
+  deleteEmployee,
+  getNewEmpId,
 };
