@@ -16,6 +16,10 @@ const {
   updateEmployeeDsr,
   filterEmployeeDsr,
 } = require("../controllers/employeeDsrController");
+const {
+  getAttendanceRecord,
+  allEmployeeAttendance,
+} = require("../controllers/attendanceRecordController");
 
 /*------employee list route-----------*/
 router.get("/", getListOfEmployees);
@@ -27,8 +31,12 @@ router.get("/getNewEmpId", getNewEmpId);
 
 /*------employDsr route-----------*/
 router.post("/employeeDsr", employeeDsr);
-router.get("/getEmployeeDsr", getEmployeeDsr);
-router.get("/getSingleEmployeeDsr", getSingleEmployeeDsr);
-router.patch("/updateEmployeeDsr", updateEmployeeDsr);
-router.get("/filterEmployeeDsr", filterEmployeeDsr);
+router.get("/get-EmployeeDsr", getEmployeeDsr);
+router.get("/getSingle-EmployeeDsr", getSingleEmployeeDsr);
+router.patch("/update-EmployeeDsr", updateEmployeeDsr);
+router.get("/filter-EmployeeDsr", filterEmployeeDsr);
+
+/*----------------attendanceRecord----------------*/
+router.get("/attendance-record", getAttendanceRecord);
+router.get("/allattendance-record", allEmployeeAttendance);
 module.exports = router;
