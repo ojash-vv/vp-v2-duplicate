@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 function formatKeys(data) {
   if (Array.isArray(data)) {
     data = data.map((record) => {
@@ -25,4 +27,29 @@ function camelize(str) {
     return chr.toUpperCase();
   });
 }
-exports.formatKeys = formatKeys;
+
+function localToUTC(date) {
+  return new moment(date, "YYYY-MM-DDTHH:mm").utc();
+}
+function formatDate(date) {
+  return new moment(date).format("YYYY-MM-DD");
+}
+// Returns an array of dates between the two dates
+function getDates(startDate, endDate) {
+  const date = new Date(startDate.getTime());
+
+  const dates = [];
+
+  while (date <= endDate) {
+    dates.push(new Date(date));
+    date.setDate(date.getDate() + 1);
+  }
+
+  return dates;
+}
+module.exports = {
+  formatKeys: formatKeys,
+  localToUTC: localToUTC,
+  getDates: getDates,
+  formatDate: formatDate,
+};

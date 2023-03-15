@@ -9,6 +9,8 @@ db.auth = require("./auth")(sequelize, DataTypes);
 db.globalTypeCategory = require("./globalTypeCategory")(sequelize, DataTypes);
 db.globalType = require("./globalType")(sequelize, DataTypes);
 db.employee = require("./employee")(sequelize, DataTypes);
+db.employeeAttendance = require("./attendance")(sequelize, DataTypes);
+db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
 // fs.readdirSync(__dirname).forEach((file) => {
 //   if (!file.includes("index.js")) {
 //     const name = file.split(".")[0].toLocaleLowerCase();

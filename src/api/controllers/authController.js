@@ -53,11 +53,11 @@ const loginUser = async (req, res) => {
             { component: "auth --->", method: "loginUser --->" },
             {
               user: isExists,
-              msg: "Password Incrrect for user: " + email,
+              msg: "Password incorrect for user: " + email,
             }
           );
           res
-            .status(401)
+            .status(200)
             .json({ status: false, error: MessageTag.PasswordWrong });
         }
       } else {
@@ -69,7 +69,7 @@ const loginUser = async (req, res) => {
           }
         );
         res
-          .status(401)
+          .status(200)
           .json({ status: false, error: MessageTag.NotFoundEmail });
       }
     } catch (error) {
