@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         required: true,
         allowNull: false,
       },
-      workingDate: DataTypes.DATE,
+      workingDate: DataTypes.STRING,
       workingHours: DataTypes.STRING,
       taskDetail: DataTypes.STRING,
       taskStatus: DataTypes.STRING,
