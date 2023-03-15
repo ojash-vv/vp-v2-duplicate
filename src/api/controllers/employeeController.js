@@ -14,10 +14,7 @@ const getListOfEmployees = async (req, res) => {
       offset: parseInt(skip),
       limit: parseInt(limit),
     });
-
-    const totalEmpCount = await Employee.findAll({
-      where: { userDesignation: "Employee" },
-    });
+    const totalEmpCount = await Employee.findAll();
     if (employee) {
       res.status(200).json({
         status: true,
@@ -35,66 +32,84 @@ const getListOfEmployees = async (req, res) => {
 const updateEmployeeData = async (req, res) => {
   const {
     userId,
-    empID,
-    empName,
-    empPersonalEmail,
-    empEmail,
-    empPassword,
-    empDesignation,
+    empId,
+    userName,
+    userPersonalEmail,
+    userEmail,
+    userPassword,
+    userDesignation,
     userRole,
-    empProfileImage,
+    userProfileImg,
     empMobileNumber,
     empDob,
     empJoinDate,
     empSal,
     empCurrentAddress,
     empPermanentAddress,
+    isActive,
   } = req?.body;
   try {
     if (
-      !empID ||
-      !empName ||
-      !empPersonalEmail ||
-      !empEmail ||
-      !empPassword ||
-      !empDesignation ||
+      !empId ||
+      !userName ||
+      !userPersonalEmail ||
+      !userEmail ||
+      !userPassword ||
+      !userDesignation ||
       !userRole ||
-      !empProfileImage ||
-      !empMobileNumber ||
-      !empCurrentAddress ||
-      !empPermanentAddress
+      // !userProfileImg ||
+      !empMobileNumber
     ) {
+      logger.error(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "Bad request by the client",
+        }
+      );
       throw new BadRequest();
     }
     const isExists = await Employee.findAll({
       where: {
-        userId: userId,
-        isActive: 1,
+        userId,
       },
     });
 
     if (isEmpty(isExists)) {
+      logger.error(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "User not found",
+        }
+      );
       throw new NotFound(null, null, null, "User not found");
     }
 
     const isUpdated = await Employee.update(
       {
-        empId: empID,
-        userPersonalEmail: empPersonalEmail,
-        userEmail: empEmail,
-        userPassword: empPassword,
-        userDesignation: empDesignation,
-        userName: empName,
+        empId: empId,
+        userPersonalEmail: userPersonalEmail,
+        userEmail: userEmail,
+        userPassword: userPassword,
+        userDesignation: userDesignation,
+        userName: userName,
         userRole: userRole,
-        userProfileImage: empProfileImage,
+        userProfileImage: userProfileImg,
         empMobileNumber: empMobileNumber,
         userBirthday: empDob,
         empJoinDate: empJoinDate,
         empSalary: empSal,
         empCurrentAddress: empCurrentAddress,
         empPermanentAddress: empPermanentAddress,
-        createdAt: new Date(),
-        isActive: 1,
+        updatedAt: new Date(),
+        isActive: isActive,
       },
       {
         where: {
@@ -103,27 +118,49 @@ const updateEmployeeData = async (req, res) => {
         returning: true,
       }
     );
-
+    let updatedUser = [];
+    if (isUpdated[1] === 1) {
+    }
+    updatedUser = await Employee.findOne({
+      where: {
+        userId: userId,
+      },
+    });
     if (!isEmpty(isUpdated)) {
       res.status(200).json({
         status: true,
         message: "success",
-        data: isUpdated,
+        data: updatedUser,
       });
+      logger.info(
+        {
+          controller: "employeeController --->",
+          method: "updateEmployeeData --->",
+        },
+        {
+          payload: `Requested employee: ${userName} and employee id :${empId}`,
+          msg: "Record updated successfully",
+        }
+      );
     }
   } catch (error) {
+    logger.error(
+      {
+        controller: "employeeController --->",
+        method: "updateEmployeeData --->",
+      },
+      {
+        payload: `Requested employee: ${userName} and employee id :${empId}`,
+        msg: `error:${error}`,
+      }
+    );
     if (error?.httpCode) {
-      res.status(error?.httpCode).json({
-        status: error?.isOperational,
+      res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+        status: error?.isOperational || false,
         message: error?.message,
-        statusCode: error?.httpCode,
+        statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
       });
     }
-    res.status(HttpStatusCode.INTERNAL_SERVER).json({
-      status: false,
-      message: error?.message,
-      statusCode: HttpStatusCode.INTERNAL_SERVER,
-    });
   }
 };
 const addNewEmployee = async (req, res) => {
@@ -152,7 +189,6 @@ const addNewEmployee = async (req, res) => {
       !empPassword ||
       !empDesignation ||
       !userRole ||
-      !empProfileImage ||
       !empMobileNumber ||
       !empCurrentAddress ||
       !empPermanentAddress
@@ -230,16 +266,16 @@ const addNewEmployee = async (req, res) => {
   }
 };
 const deleteEmployee = async (req, res) => {
-  const { empID, userId } = req?.body;
+  const { empId, userId } = req?.params;
   try {
-    if (!empID || !userId) {
+    if (!empId || !userId) {
       throw new BadRequest();
     }
 
     const isEmpIdExists = await Employee.findAll({
       where: {
-        empId: empID,
-        userId: userId,
+        empId: empId,
+        userId: parseInt(userId),
         isDeleted: 0,
       },
     });
@@ -250,11 +286,12 @@ const deleteEmployee = async (req, res) => {
     const isDeleted = await Employee.update(
       {
         isDeleted: 1,
+        isActive: 0,
       },
       {
         where: {
-          userId: userId,
-          empID: empID,
+          userId: parseInt(userId),
+          empID: empId,
         },
         returning: true,
       }
@@ -268,24 +305,64 @@ const deleteEmployee = async (req, res) => {
       });
     }
   } catch (error) {
-    if (error?.httpCode) {
-      res.status(error?.httpCode).json({
-        status: error?.isOperational,
-        message: error?.message,
-        statusCode: error?.httpCode,
-      });
-    }
-    res.status(HttpStatusCode.INTERNAL_SERVER).json({
-      status: false,
+    res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+      status: error?.isOperational || false,
       message: error?.message,
-      statusCode: HttpStatusCode.INTERNAL_SERVER,
+      statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
     });
   }
 };
 
+const getNewEmpId = async (req, res) => {
+  try {
+    const lastRecord = await Employee.findOne({
+      order: [["userId", "DESC"]],
+    });
+    if (isEmpty(lastRecord)) {
+      throw new NotFound();
+    }
+    const { empId } = lastRecord;
+    const newEmpId = `VVT-${parseInt(empId.split("-")[1], 10) + 1}`;
+    res.status(200).json({
+      status: true,
+      message: "success",
+      data: newEmpId,
+      statusCode: HttpStatusCode.OK,
+    });
+    logger.info(
+      {
+        controller: "employeeController --->",
+        method: "getNewEmpId --->",
+      },
+      {
+        payload: null,
+        msg: "Record fetch and sent successfully",
+      }
+    );
+  } catch (error) {
+    // uncomment this error log once the emp id is attached on the api call headers
+
+    // logger.error(
+    //   {
+    //     controller: "employeeController --->",
+    //     method: "getNewEmpId --->",
+    //   },
+    //   {
+    //     payload: `Requested user: ${userName} and employee id :${empId}`,
+    //     msg: `error:${error}`,
+    //   }
+    // );
+    res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+      status: error?.isOperational || false,
+      message: error?.message,
+      statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+    });
+  }
+};
 module.exports = {
   getListOfEmployees,
   updateEmployeeData,
   addNewEmployee,
   deleteEmployee,
+  getNewEmpId,
 };
