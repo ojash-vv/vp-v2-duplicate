@@ -38,5 +38,5 @@ router.get("/filter-EmployeeDsr", filterEmployeeDsr);
 
 /*----------------attendanceRecord----------------*/
 router.get("/attendance-record", getAttendanceRecord);
-router.get("/allattendance-record", allEmployeeAttendance);
+router.get("/allAttendance-record", allEmployeeAttendance);
 module.exports = router;

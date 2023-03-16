@@ -13,6 +13,7 @@ const getListOfEmployees = async (req, res) => {
     const employee = await Employee.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
+      order: [["userId", "DESC"]],
     });
     const totalEmpCount = await Employee.findAll();
     if (employee) {
