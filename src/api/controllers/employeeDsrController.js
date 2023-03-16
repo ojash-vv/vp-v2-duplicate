@@ -13,19 +13,20 @@ const employeeDsr = async (req, res) => {
 
   try {
     if (!employeeDSRdata) {
+      0;
       throw new BadRequest();
     }
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: "vvt-12",
-        projectId: currentEmployeeDSR.projectName,
-        workingDate: currentEmployeeDSR.workingDate,
+        empId: currentEmployeeDSR?.empId.toUpperCase(),
+        projectId: currentEmployeeDSR?.projectId,
+        workingDate: currentEmployeeDSR?.workingDate,
 
-        workingHours: currentEmployeeDSR.taskMinutes,
-        taskDetail: currentEmployeeDSR.taskDetails,
-        taskStatus: currentEmployeeDSR.taskStatus,
+        workingHours: currentEmployeeDSR?.taskMinutes,
+        taskDetail: currentEmployeeDSR?.taskDetails,
+        taskStatus: currentEmployeeDSR?.taskStatus,
 
         createdBy: "1",
         createdAt: new Date(),
@@ -52,7 +53,7 @@ const employeeDsr = async (req, res) => {
       },
       {
         empId: "employeeId" + empId,
-        msg: "Catch error: " + error?.message,
+        msg: "Catch error: " + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message });
@@ -61,7 +62,6 @@ const employeeDsr = async (req, res) => {
 
 const getEmployeeDsr = async (req, res) => {
   const { skip = 0, limit = 0, empId } = req?.query;
-
   try {
     if (!empId) {
       throw new BadRequest();
@@ -111,8 +111,7 @@ const getEmployeeDsr = async (req, res) => {
   }
 };
 const getSingleEmployeeDsr = async (req, res) => {
-  const { id, empId } = req?.body;
-
+  const { id, empId } = req?.query;
   try {
     if (!id || !empId) {
       throw new BadRequest();
@@ -148,7 +147,7 @@ const getSingleEmployeeDsr = async (req, res) => {
       },
       {
         empId: "employId: " + empId,
-        msg: "Catch error:" + error?.message,
+        msg: "Catch error:" + error?.msg,
       }
     );
     res
@@ -230,7 +229,7 @@ const updateEmployeeDsr = async (req, res) => {
       },
       {
         empId: "employeeId:" + empId,
-        msg: "Catch error:" + error?.message,
+        msg: "Catch error:" + error?.msg,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });

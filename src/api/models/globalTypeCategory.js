@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       updatedBy: DataTypes.INTEGER,
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
-      isDeleted: DataTypes.BOOLEAN,
+      isDeleted: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
     },
     {
       tableName: "globaltypecategory",

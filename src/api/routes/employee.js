@@ -6,6 +6,7 @@ const {
   updateEmployeeData,
   addNewEmployee,
   deleteEmployee,
+  getNewEmpId,
 } = require("../controllers/employeeController");
 const { markAttendance } = require("../controllers/attendanceController");
 const {
@@ -15,17 +16,27 @@ const {
   updateEmployeeDsr,
   filterEmployeeDsr,
 } = require("../controllers/employeeDsrController");
+const {
+  getAttendanceRecord,
+  allEmployeeAttendance,
+} = require("../controllers/attendanceRecordController");
 
+/*------employee list route-----------*/
 router.get("/", getListOfEmployees);
 router.post("/", addNewEmployee);
 router.patch("/", updateEmployeeData);
-router.delete("/", deleteEmployee);
+router.delete("/:userId/:empId", deleteEmployee);
 router.post("/markAttendance", markAttendance);
+router.get("/getNewEmpId", getNewEmpId);
 
 /*------employDsr route-----------*/
 router.post("/employeeDsr", employeeDsr);
-router.get("/getEmployeeDsr", getEmployeeDsr);
-router.get("/getSingleEmployeeDsr", getSingleEmployeeDsr);
-router.patch("/updateEmployeeDsr", updateEmployeeDsr);
-router.get("/filterEmployeeDsr", filterEmployeeDsr);
+router.get("/get-EmployeeDsr", getEmployeeDsr);
+router.get("/getSingle-EmployeeDsr", getSingleEmployeeDsr);
+router.patch("/update-EmployeeDsr", updateEmployeeDsr);
+router.get("/filter-EmployeeDsr", filterEmployeeDsr);
+
+/*----------------attendanceRecord----------------*/
+router.get("/attendance-record", getAttendanceRecord);
+router.get("/allattendance-record", allEmployeeAttendance);
 module.exports = router;
