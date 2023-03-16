@@ -61,13 +61,17 @@ const employeeDsr = async (req, res) => {
 
 const getEmployeeDsr = async (req, res) => {
   const { skip = 0, limit = 0, empId } = req?.query;
+
   try {
     if (!empId) {
       throw new BadRequest();
     }
     const isExists = await employee.findAll({
       offset: parseInt(skip),
-      limit: parseInt(limit),
+      limit: parseInt(limit - skip),
+      where: {
+        empId,
+      },
     });
     const totalCount = await employee.findAll({});
 
@@ -80,6 +84,7 @@ const getEmployeeDsr = async (req, res) => {
         message: "success",
         data: { dsrList: isExists, totalCount: totalCount?.length },
       });
+
       logger.info(
         {
           controller: "employeeDsrController --->",
@@ -248,7 +253,7 @@ const filterEmployeeDsr = async (req, res) => {
     if (taskDetail && startDate && endDate) {
       var isExists = await employee.findAll({
         offset: parseInt(skip),
-        limit: parseInt(limit),
+        limit: parseInt(limit - skip),
         where: {
           taskDetail: taskDetail,
           workingDate: {
@@ -259,7 +264,7 @@ const filterEmployeeDsr = async (req, res) => {
     } else if (taskDetail) {
       var isExists = await employee.findAll({
         offset: parseInt(skip),
-        limit: parseInt(limit),
+        limit: parseInt(limit - skip),
         where: {
           taskDetail: taskDetail,
         },
@@ -267,7 +272,7 @@ const filterEmployeeDsr = async (req, res) => {
     } else if (startDate && endDate) {
       var isExists = await employee.findAll({
         offset: parseInt(skip),
-        limit: parseInt(limit),
+        limit: parseInt(limit - skip),
         where: {
           workingDate: {
             [Op.between]: [startDate, endDate],
