@@ -1,6 +1,6 @@
 module.exports = (sequalize, DataTypes) => {
-  const AttendenceRecord = sequalize.define(
-    "AttendenceRecord",
+  const AttendanceRecord = sequalize.define(
+    "AttendanceRecord",
     {
       empId: {
         type: DataTypes.STRING,
@@ -27,5 +27,5 @@ module.exports = (sequalize, DataTypes) => {
       updatedAt: false,
     }
   );
-  return AttendenceRecord;
+  return AttendanceRecord;
 };
