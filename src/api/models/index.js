@@ -12,7 +12,7 @@ db.employee = require("./employee")(sequelize, DataTypes);
 db.employeeAttendance = require("./attendance")(sequelize, DataTypes);
 db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
-db.AttendenceRecord = require("./AttendenceRecord")(sequelize, DataTypes);
+db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 
 // fs.readdirSync(__dirname).forEach((file) => {
 //   if (!file.includes("index.js")) {
