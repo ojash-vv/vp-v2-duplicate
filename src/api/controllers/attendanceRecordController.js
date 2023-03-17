@@ -5,7 +5,7 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
-const employee = db.AttendenceRecord;
+const AttendanceRecord = db.attendanceRecord;
 
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
@@ -24,7 +24,7 @@ const getAttendanceRecord = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const findAttendanceRecord = await employee.findAll({
+    const findAttendanceRecord = await AttendanceRecord.findAll({
       where: {
         empId: empId,
         createdAt: {
@@ -32,7 +32,6 @@ const getAttendanceRecord = async (req, res) => {
         },
       },
     });
-    console.log(findAttendanceRecord);
     if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
     }
@@ -51,7 +50,7 @@ const getAttendanceRecord = async (req, res) => {
           month: month,
         };
         employeeData.data = {
-          presenDays: employeePresentDays,
+          presentDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         };
         employeeAttendanceRecord.push(employeeData);
@@ -65,22 +64,22 @@ const getAttendanceRecord = async (req, res) => {
     logger.info(
       {
         controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        method: "getAttendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "employess attendance record",
+        empId: `employeeId: ${empId}`,
+        msg: "employee attendance record",
       }
     );
   } catch (error) {
     logger.error(
       {
         controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        method: "getAttendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "catch error" + error?.msg,
+        empId: `employeeId: ${empId}`,
+        msg: `catch error: ${error?.message}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -93,7 +92,7 @@ const allEmployeeAttendance = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const fetchedRecoreds = await employee.findAll({
+    const fetchedRecords = await AttendanceRecord.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -103,12 +102,12 @@ const allEmployeeAttendance = async (req, res) => {
       },
     });
 
-    if (isEmpty(fetchedRecoreds)) {
+    if (isEmpty(fetchedRecords)) {
       throw new NotFound();
     }
     const processedIds = {};
-    for (let i = 0; i < fetchedRecoreds.length; i++) {
-      const empId = fetchedRecoreds[i].empId;
+    for (let i = 0; i < fetchedRecords.length; i++) {
+      const empId = fetchedRecords[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
         const currentEmployeeData = {
@@ -116,7 +115,7 @@ const allEmployeeAttendance = async (req, res) => {
           data: [],
         };
         for (let j = 0; j < 12; j++) {
-          const newAttendance = fetchedRecoreds.filter(
+          const newAttendance = fetchedRecords.filter(
             (data) =>
               data.empId === empId && new Date(data.createdAt).getMonth() === j
           );
@@ -147,7 +146,7 @@ const allEmployeeAttendance = async (req, res) => {
         method: "get all employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
+        empId: `employeeId: ${empId}`,
         msg: "get all employee attendance record",
       }
     );
