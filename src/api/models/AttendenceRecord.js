@@ -3,6 +3,7 @@ module.exports = (sequalize, DataTypes) => {
     "AttendenceRecord",
     {
       empId: {
+        foreignKey: true,
         type: DataTypes.STRING,
         required: true,
         allowNull: false,

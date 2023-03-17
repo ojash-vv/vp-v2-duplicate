@@ -1,7 +1,7 @@
 const db = require("../models/index");
 const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
-const employee = db.employeeDsr;
+const EmployeeDsr = db.employeeDsr;
 const HttpStatusCode = require("../../enums/httpErrorCodes");
 const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { Op } = require("sequelize");
@@ -16,7 +16,7 @@ const employeeDsr = async (req, res) => {
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
-      isCreated = await employee.create({
+      isCreated = await EmployeeDsr.create({
         empId: currentEmployeeDSR.empId.toUpperCase(),
         projectId: currentEmployeeDSR.projectId,
         workingDate: currentEmployeeDSR.workingDate,
@@ -62,7 +62,7 @@ const getEmployeeDsr = async (req, res) => {
     if (!empId) {
       throw new BadRequest();
     }
-    const isExists = await employee.findAll({
+    const isExists = await EmployeeDsr.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
     });
@@ -108,17 +108,17 @@ const getSingleEmployeeDsr = async (req, res) => {
     if (!id || !empId) {
       throw new BadRequest();
     }
-    const isExists = await employee.findOne({
+    const getSingleEmployee = await EmployeeDsr.findOne({
       where: {
         id: id,
       },
     });
-    if (isEmpty(isExists)) {
+    if (isEmpty(getSingleEmployee)) {
       throw new NotFound();
     }
     res.status(HttpStatusCode.OK).send({
       status: true,
-      data: isExists,
+      data: getSingleEmployee,
       message: "success",
     });
     logger.info(
@@ -172,15 +172,15 @@ const updateEmployeeDsr = async (req, res) => {
     ) {
       throw new BadRequest();
     }
-    const isExists = await employee.findOne({
+    const getUpdateEmployee = await EmployeeDsr.findOne({
       where: {
         id: id,
       },
     });
-    if (isEmpty(isExists)) {
+    if (isEmpty(getUpdateEmployee)) {
       throw new NotFound();
     }
-    const isUpdated = await employee.update(
+    const isUpdated = await EmployeeDsr.update(
       {
         empId: empId,
         projectId: projectId,
@@ -243,7 +243,7 @@ const filterEmployeeDsr = async (req, res) => {
       throw new BadRequest();
     }
     if (taskDetail && startDate && endDate) {
-      var isExists = await employee.findAll({
+      var getFilterData = await EmployeeDsr.findAll({
         offset: parseInt(skip),
         limit: parseInt(limit),
         where: {
@@ -254,7 +254,7 @@ const filterEmployeeDsr = async (req, res) => {
         },
       });
     } else if (taskDetail) {
-      var isExists = await employee.findAll({
+      var getFilterData = await EmployeeDsr.findAll({
         offset: parseInt(skip),
         limit: parseInt(limit),
         where: {
@@ -262,7 +262,7 @@ const filterEmployeeDsr = async (req, res) => {
         },
       });
     } else if (startDate && endDate) {
-      var isExists = await employee.findAll({
+      var getFilterData = await EmployeeDsr.findAll({
         offset: parseInt(skip),
         limit: parseInt(limit),
         where: {
@@ -273,13 +273,13 @@ const filterEmployeeDsr = async (req, res) => {
       });
     }
 
-    if (isEmpty(isExists)) {
+    if (isEmpty(getFilterData)) {
       throw new NotFound();
     }
     res.status(HttpStatusCode?.OK).json({
       status: true,
       message: "success",
-      data: isExists,
+      data: getFilterData,
     });
     logger.info(
       {
