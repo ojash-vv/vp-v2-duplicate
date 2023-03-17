@@ -114,13 +114,13 @@ const allEmployeeAttendance = async (req, res) => {
       const empId = fetchedRecoreds[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
-        const employeeName = await Employee.findAll({
+        const employeeData = await Employee.findAll({
           where: {
             empId: empId,
           },
         });
-        for (let user = 0; user < employeeName.length; user++) {
-          const name = employeeName[user].userName;
+        for (let user = 0; user < employeeData.length; user++) {
+          const name = employeeData[user].userName;
           const currentEmployeeData = {
             empId: empId,
             name: name,

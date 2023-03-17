@@ -9,8 +9,7 @@ const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;
   const empId = employeeDSRdata.empId;
   try {
-    if (!employeeDSRdata) {
-      0;
+    if (!employeeDSRdata && !empId) {
       throw new BadRequest();
     }
     let isCreated;
@@ -108,7 +107,7 @@ const getSingleEmployeeDsr = async (req, res) => {
     if (!id || !empId) {
       throw new BadRequest();
     }
-    const getSingleEmployee = await EmployeeDsr.findOne({
+    const isEmployeeExists = await EmployeeDsr.findOne({
       where: {
         id: id,
       },
