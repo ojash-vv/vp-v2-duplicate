@@ -32,7 +32,6 @@ const markLeave = async (req, res) => {
     }
     leaveDays.forEach(async function (date) {
       const LeaveDate = ObjectHelper.formatDate(date);
-      console.log(LeaveDate);
 
       const isExists = await EmployeeLeave.findOne({
         where: {
@@ -79,6 +78,7 @@ const markLeave = async (req, res) => {
       leaveTo: enadDateUtc,
       leaveDays: leaveDays,
       leaveReason,
+      leaveStatus: "1",
       createdBy: "1",
       updatedBy: "1",
       createdAt: new Date(),
@@ -115,6 +115,54 @@ const markLeave = async (req, res) => {
   }
   return;
 };
+
+const getEmployeeLeave = async (req, res) => {
+  logger.warn(
+    {
+      component: "leaveController --->",
+      method: "getEmployeeLeave --->",
+    },
+    { payload: null, msg: "Get Employee Leave started....." }
+  );
+
+  try {
+    const result = await EmployeeLeave.findAll({
+      where: {
+        where: sequelize.where(sequelize.col("leaveStatus"), "=", "1"),
+      },
+    });
+    const [results, metadata] = await db.sequelize.query(
+      "SELECT emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId where leaveStatus=1"
+    );
+    res.status(200).send({
+      status: true,
+      data: results,
+    });
+    logger.info(
+      {
+        component: "leaveController --->",
+        method: "getEmployeeLeave --->",
+      },
+      {
+        payload: null,
+        msg: "Employee Leave List: ",
+      }
+    );
+  } catch (error) {
+    logger.error(
+      {
+        component: "leaveController --->",
+        method: "getEmployeeLeave --->",
+      },
+      {
+        payload: null,
+        msg: "Catch error: " + error?.message,
+      }
+    );
+    res.status(400).json({ status: false, error: error?.message });
+  }
+};
 module.exports = {
   markLeave,
+  getEmployeeLeave,
 };

@@ -20,7 +20,10 @@ const {
   getAttendanceRecord,
   allEmployeeAttendance,
 } = require("../controllers/attendanceRecordController");
-const { markLeave } = require("../controllers/leaveController");
+const {
+  markLeave,
+  getEmployeeLeave,
+} = require("../controllers/leaveController");
 
 /*------employee list route-----------*/
 router.get("/", getListOfEmployees);
@@ -28,7 +31,6 @@ router.post("/", addNewEmployee);
 router.patch("/", updateEmployeeData);
 router.delete("/:userId/:empId", deleteEmployee);
 router.post("/markAttendance", markAttendance);
-router.post("/markLeave", markLeave);
 router.get("/getNewEmpId", getNewEmpId);
 
 /*------employDsr route-----------*/
@@ -41,4 +43,9 @@ router.get("/filter-EmployeeDsr", filterEmployeeDsr);
 /*----------------attendanceRecord----------------*/
 router.get("/attendance-record", getAttendanceRecord);
 router.get("/allattendance-record", allEmployeeAttendance);
+
+/*******************Employee Leave********************/
+router.post("/markLeave", markLeave);
+router.get("/allEmployee-leave", getEmployeeLeave);
+
 module.exports = router;
