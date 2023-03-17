@@ -8,8 +8,7 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { Op } = require("sequelize");
 const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;
-
-  const empId = employeeDSRdata.empId;
+  const { empId } = req?.query;
 
   try {
     if (!employeeDSRdata) {
@@ -20,7 +19,7 @@ const employeeDsr = async (req, res) => {
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
       isCreated = await employee.create({
-        empId: currentEmployeeDSR?.empId.toUpperCase(),
+        empId: empId.toUpperCase(),
         projectId: currentEmployeeDSR?.projectId,
         workingDate: currentEmployeeDSR?.workingDate,
 
