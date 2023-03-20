@@ -10,6 +10,8 @@ db.globalTypeCategory = require("./globalTypeCategory")(sequelize, DataTypes);
 db.globalType = require("./globalType")(sequelize, DataTypes);
 db.employee = require("./employee")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
+db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
+
 // fs.readdirSync(__dirname).forEach((file) => {
 //   if (!file.includes("index.js")) {
 //     const name = file.split(".")[0].toLocaleLowerCase();
@@ -17,7 +19,6 @@ db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
 //     sequelize, DataTypes;
 //   }
 // });
-
 sequelize.sync().then(() => {
   console.log("sync is done");
 });
