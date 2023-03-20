@@ -1,12 +1,24 @@
 const { Sequelize } = require("sequelize");
 
-const dbConfig =
-  process.env.NODE_ENV === "development"
-    ? process.env.LOCAL_DB_URI
-    : process.env.PROD_DB_URI;
+const dbConfig = {
+  name: process.env.dbName,
+  username: process.env.dbUsername,
+  password: process.env.dbPassword,
+  host: process.env.dbHost,
+  port: process.env.dbPort,
+  dialect: process.env.dbDialect,
+};
 
-const sequelize = new Sequelize(dbConfig, {
-  pool: { min: 0, max: 5, idle: 10000 },
-});
+const sequelize = new Sequelize(
+  dbConfig?.name,
+  dbConfig?.username,
+  dbConfig?.password,
+  {
+    host: dbConfig?.host,
+    port: dbConfig?.port,
+    dialect: dbConfig?.dialect,
+    pool: { min: 0, max: 5, idle: 10000 },
+  }
+);
 
 module.exports = sequelize;
