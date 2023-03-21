@@ -5,8 +5,8 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
-const Attendance = db.AttendenceRecord;
-const Employee = db.employee;
+const employee = db.AttendenceRecord;
+
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
   for (let day = 1; day <= daysInMonth; day++) {
@@ -23,7 +23,7 @@ const getAttendanceRecord = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const findAttendanceRecord = await Attendance.findAll({
+    const findAttendanceRecord = await employee.findAll({
       where: {
         empId: empId,
         createdAt: {
@@ -37,7 +37,6 @@ const getAttendanceRecord = async (req, res) => {
         },
       ],
     });
-    console.log(findAttendanceRecord);
     if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
     }
@@ -54,7 +53,10 @@ const getAttendanceRecord = async (req, res) => {
       const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
       const employeePresentDays = newAttendance.length;
       if (weekdaysInMonth || employeePresentDays) {
-        employeeName.data.push(month, {
+        const employeeData = {
+          month: month,
+        };
+        employeeData.data = {
           presenDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         });
@@ -69,22 +71,22 @@ const getAttendanceRecord = async (req, res) => {
     logger.info(
       {
         controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        method: "getAttendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "employess attendance record",
+        empId: `employeeId: ${empId}`,
+        msg: "employee attendance record",
       }
     );
   } catch (error) {
     logger.error(
       {
         controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        method: "getAttendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "catch error" + error?.msg,
+        empId: `employeeId: ${empId}`,
+        msg: `catch error: ${error?.message}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -97,7 +99,7 @@ const allEmployeeAttendance = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const fetchedRecoreds = await Attendance.findAll({
+    const fetchedRecoreds = await employee.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -106,44 +108,35 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
+
     if (isEmpty(fetchedRecoreds)) {
       throw new NotFound();
     }
     const processedIds = {};
-    for (let i = 0; i < fetchedRecoreds.length; i++) {
-      const empId = fetchedRecoreds[i].empId;
+    for (let i = 0; i < fetchedRecords.length; i++) {
+      const empId = fetchedRecords[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
-        const employeeData = await Employee.findAll({
-          where: {
-            empId: empId,
-          },
-        });
-        for (let user = 0; user < employeeData.length; user++) {
-          const name = employeeData[user].userName;
-          const currentEmployeeData = {
-            empId: empId,
-            name: name,
-            data: [],
-          };
-          for (let j = 0; j < 12; j++) {
-            const newAttendance = fetchedRecoreds.filter(
-              (data) =>
-                data.empId === empId &&
-                new Date(data.createdAt).getMonth() === j
-            );
-            const month = monthNames[j];
-            const daysInMonth = new Date(year, j + 1, 0).getDate();
-            const weekendsDaysInMonth = getWeekend(daysInMonth, j, year);
-            const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
-            const employeePresentDays = newAttendance.length;
-            if (weekdaysInMonth || employeePresentDays) {
-              currentEmployeeData.data.push({
-                month: month,
-                presentDays: employeePresentDays,
-                workingDays: weekdaysInMonth,
-              });
-            }
+        const currentEmployeeData = {
+          empId: empId,
+          data: [],
+        };
+        for (let j = 0; j < 12; j++) {
+          const newAttendance = fetchedRecoreds.filter(
+            (data) =>
+              data.empId === empId && new Date(data.createdAt).getMonth() === j
+          );
+          const month = monthNames[j];
+          const daysInMonth = new Date(year, j + 1, 0).getDate();
+          const weekendsDaysInMonth = getWeekend(daysInMonth, j, year);
+          const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
+          const employeePresentDays = newAttendance.length;
+          if (weekdaysInMonth || employeePresentDays) {
+            currentEmployeeData.data.push({
+              month: month,
+              presentDays: employeePresentDays,
+              workingDays: weekdaysInMonth,
+            });
           }
           allEmployeeAttendanceRecords.push(currentEmployeeData);
         }
@@ -160,7 +153,7 @@ const allEmployeeAttendance = async (req, res) => {
         method: "get all employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
+        empId: `employeeId: ${empId}`,
         msg: "get all employee attendance record",
       }
     );
