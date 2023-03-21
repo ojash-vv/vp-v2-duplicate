@@ -1,12 +1,12 @@
 const { Sequelize } = require("sequelize");
 
 const dbConfig = {
-  name: process.env.dbName,
-  username: process.env.dbUsername,
-  password: process.env.dbPassword,
-  host: process.env.dbHost,
-  port: process.env.dbPort,
-  dialect: process.env.dbDialect,
+  name: process.env.DB_NAME,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  dialect: process.env.DB_DIALECT,
 };
 
 const sequelize = new Sequelize(
