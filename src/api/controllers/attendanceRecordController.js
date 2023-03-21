@@ -5,7 +5,7 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
-const AttendanceRecord = db.AttendenceRecord;
+const Attendance = db.attendanceRecord;
 const Employee = db.employee;
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
@@ -23,19 +23,13 @@ const getAttendanceRecord = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const findAttendanceRecord = await AttendanceRecord.findAll({
+    const findAttendanceRecord = await Attendance.findAll({
       where: {
         empId: empId,
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
         },
       },
-      include: [
-        {
-          model: Employee,
-          as: "Employee",
-        },
-      ],
     });
     if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
@@ -96,7 +90,7 @@ const allEmployeeAttendance = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const fetchedRecords = await AttendanceRecord.findAll({
+    const fetchedRecords = await Attendance.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -105,9 +99,6 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
-    if (isEmpty(fetchedRecords)) {
-      throw new NotFound();
-    }
     const processedIds = {};
     for (let i = 0; i < fetchedRecords.length; i++) {
       const empId = fetchedRecords[i].empId;
@@ -118,6 +109,7 @@ const allEmployeeAttendance = async (req, res) => {
             empId: empId,
           },
         });
+
         for (let user = 0; user < employeeData.length; user++) {
           const name = employeeData[user].userName;
           const currentEmployeeData = {
@@ -177,7 +169,7 @@ const allEmployeeAttendance = async (req, res) => {
     res.status(HttpStatusCode.BAD_REQUEST).json({
       status: false,
       message: "error",
-      error: error.message,
+      error: error?.message,
     });
   }
 };
