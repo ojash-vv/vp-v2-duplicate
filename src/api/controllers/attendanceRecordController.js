@@ -5,7 +5,7 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
-const Attendance = db.AttendenceRecord;
+const AttendanceRecord = db.AttendenceRecord;
 const Employee = db.employee;
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
@@ -23,7 +23,7 @@ const getAttendanceRecord = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const findAttendanceRecord = await Attendance.findAll({
+    const findAttendanceRecord = await AttendanceRecord.findAll({
       where: {
         empId: empId,
         createdAt: {
@@ -37,7 +37,6 @@ const getAttendanceRecord = async (req, res) => {
         },
       ],
     });
-    console.log(findAttendanceRecord);
     if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
     }
@@ -97,7 +96,7 @@ const allEmployeeAttendance = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const fetchedRecoreds = await Attendance.findAll({
+    const fetchedRecords = await AttendanceRecord.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -106,12 +105,12 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
-    if (isEmpty(fetchedRecoreds)) {
+    if (isEmpty(fetchedRecords)) {
       throw new NotFound();
     }
     const processedIds = {};
-    for (let i = 0; i < fetchedRecoreds.length; i++) {
-      const empId = fetchedRecoreds[i].empId;
+    for (let i = 0; i < fetchedRecords.length; i++) {
+      const empId = fetchedRecords[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
         const employeeData = await Employee.findAll({

@@ -6,6 +6,7 @@ const {
   updateEmployeeData,
   addNewEmployee,
   deleteEmployee,
+  getNewEmpId,
 } = require("../controllers/employeeController");
 const { markAttendance } = require("../controllers/attendanceController");
 const {
@@ -19,11 +20,14 @@ const {
   getAttendanceRecord,
   allEmployeeAttendance,
 } = require("../controllers/attendanceRecordController");
+
+/*------employee list route-----------*/
 router.get("/", getListOfEmployees);
 router.post("/", addNewEmployee);
 router.patch("/", updateEmployeeData);
-router.delete("/", deleteEmployee);
+router.delete("/:userId/:empId", deleteEmployee);
 router.post("/markAttendance", markAttendance);
+router.get("/getNewEmpId", getNewEmpId);
 
 /*------employDsr route-----------*/
 router.post("/employeeDsr", employeeDsr);
@@ -34,5 +38,5 @@ router.get("/filter-EmployeeDsr", filterEmployeeDsr);
 
 /*----------------attendanceRecord----------------*/
 router.get("/attendance-record", getAttendanceRecord);
-router.get("/allattendance-record", allEmployeeAttendance);
+router.get("/allAttendance-record", allEmployeeAttendance);
 module.exports = router;
