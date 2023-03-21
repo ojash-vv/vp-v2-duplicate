@@ -126,7 +126,7 @@ const allEmployeeAttendance = async (req, res) => {
             data: [],
           };
           for (let j = 0; j < 12; j++) {
-            const newAttendance = fetchedRecoreds.filter(
+            const newAttendance = fetchedRecords.filter(
               (data) =>
                 data.empId === empId &&
                 new Date(data.createdAt).getMonth() === j
