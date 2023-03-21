@@ -4,13 +4,10 @@ const { logger } = require("../../helper/logger");
 const EmployeeDsr = db.employeeDsr;
 const HttpStatusCode = require("../../enums/httpErrorCodes");
 const { BadRequest, NotFound } = require("../../helper/apiErros");
-
 const { Op } = require("sequelize");
 const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;
-
   const empId = employeeDSRdata.empId;
-
   try {
     if (!employeeDSRdata && !empId) {
       throw new BadRequest();
@@ -18,14 +15,13 @@ const employeeDsr = async (req, res) => {
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
-      isCreated = await employee.create({
-        empId: currentEmployeeDSR.empId.toUpperCase(),
-        projectId: currentEmployeeDSR.projectId,
-        workingDate: currentEmployeeDSR.workingDate,
-        workingHours: currentEmployeeDSR.workingHours,
-        taskDetail: currentEmployeeDSR.taskDetail,
-        taskStatus: currentEmployeeDSR.taskStatus,
-        taskMinutes: currentEmployeeDSR.taskMinutes,
+      isCreated = await EmployeeDsr.create({
+        empId: currentEmployeeDSR?.empId.toUpperCase(),
+        projectId: currentEmployeeDSR?.projectId,
+        workingDate: currentEmployeeDSR?.workingDate,
+        workingHours: currentEmployeeDSR?.taskMinutes,
+        taskDetail: currentEmployeeDSR?.taskDetails,
+        taskStatus: currentEmployeeDSR?.taskStatus,
         createdBy: "1",
         createdAt: new Date(),
       });
@@ -71,7 +67,7 @@ const getEmployeeDsr = async (req, res) => {
         empId,
       },
     });
-    const totalCount = await employee.findAll({});
+    const totalCount = await EmployeeDsr.findAll({});
 
     if (isEmpty(isExists)) {
       throw new NotFound();
@@ -82,7 +78,6 @@ const getEmployeeDsr = async (req, res) => {
         message: "success",
         data: { dsrList: isExists, totalCount: totalCount?.length },
       });
-
       logger.info(
         {
           controller: "employeeDsrController --->",
@@ -108,6 +103,7 @@ const getEmployeeDsr = async (req, res) => {
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
   }
 };
+
 const getSingleEmployeeDsr = async (req, res) => {
   const { id, empId } = req?.query;
   try {
@@ -119,12 +115,12 @@ const getSingleEmployeeDsr = async (req, res) => {
         id: id,
       },
     });
-    if (isEmpty(getSingleEmployee)) {
+    if (isEmpty(isEmployeeExists)) {
       throw new NotFound();
     }
     res.status(HttpStatusCode.OK).send({
       status: true,
-      data: getSingleEmployee,
+      data: isEmployeeExists,
       message: "success",
     });
     logger.info(
@@ -233,6 +229,7 @@ const updateEmployeeDsr = async (req, res) => {
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });
   }
 };
+
 const filterEmployeeDsr = async (req, res) => {
   const {
     skip = 0,
@@ -278,7 +275,7 @@ const filterEmployeeDsr = async (req, res) => {
       });
     }
     if (taskDetail && startDate && endDate) {
-      var totalFilterData = await employee.findAll({
+      var totalFilterData = await EmployeeDsr.findAll({
         where: {
           taskDetail: taskDetail,
           workingDate: {
@@ -287,13 +284,13 @@ const filterEmployeeDsr = async (req, res) => {
         },
       });
     } else if (taskDetail) {
-      var totalFilterData = await employee.findAll({
+      var totalFilterData = await EmployeeDsr.findAll({
         where: {
           taskDetail: taskDetail,
         },
       });
     } else if (startDate && endDate) {
-      var totalFilterData = await employee.findAll({
+      var totalFilterData = await EmployeeDsr.findAll({
         where: {
           workingDate: {
             [Op.between]: [startDate, endDate],
@@ -302,13 +299,13 @@ const filterEmployeeDsr = async (req, res) => {
       });
     }
 
-    if (isEmpty(isExists)) {
+    if (isEmpty(getFilterData)) {
       throw new NotFound();
     }
     res.status(HttpStatusCode?.OK).json({
       status: true,
       message: "success",
-      data: isExists,
+      data: { dsrList: getFilterData, totalCount: totalFilterData?.length },
     });
     logger.info(
       {
