@@ -5,8 +5,8 @@ const { BadRequest, NotFound } = require("../../helper/apiErros");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
-const AttendanceRecord = db.attendanceRecord;
-
+const Attendance = db.attendanceRecord;
+const Employee = db.employee;
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
   for (let day = 1; day <= daysInMonth; day++) {
@@ -18,13 +18,12 @@ const getWeekend = (daysInMonth, month, year) => {
   return weekends;
 };
 const getAttendanceRecord = async (req, res) => {
-  const employeeAttendanceRecord = [];
   const { year, empId } = req?.query;
   try {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const findAttendanceRecord = await AttendanceRecord.findAll({
+    const findAttendanceRecord = await Attendance.findAll({
       where: {
         empId: empId,
         createdAt: {
@@ -35,6 +34,9 @@ const getAttendanceRecord = async (req, res) => {
     if (isEmpty(findAttendanceRecord)) {
       throw new NotFound();
     }
+    const employeeName = {
+      data: [],
+    };
     for (let i = 0; i < 12; i++) {
       const newAttendance = findAttendanceRecord.filter(
         (data) => new Date(data.createdAt).getMonth() === i
@@ -44,42 +46,38 @@ const getAttendanceRecord = async (req, res) => {
       const weekendsDaysInMonth = getWeekend(daysInMonth, i, year);
       const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
       const employeePresentDays = newAttendance.length;
-
       if (weekdaysInMonth || employeePresentDays) {
-        const employeeData = {
-          month: month,
-        };
-        employeeData.data = {
-          presentDays: employeePresentDays,
+        employeeName.data.push(month, {
+          presenDays: employeePresentDays,
           workingDays: weekdaysInMonth,
-        };
-        employeeAttendanceRecord.push(employeeData);
+        });
       }
     }
+
     res.status(HttpStatusCode?.OK).json({
       status: true,
       message: "success",
-      data: employeeAttendanceRecord,
+      data: employeeName,
     });
     logger.info(
       {
         controller: "attendanceRecord",
-        method: "getAttendanceRecord",
+        method: "get employee attendanceRecord",
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: "employee attendance record",
+        msg: "employess attendance record",
       }
     );
   } catch (error) {
     logger.error(
       {
         controller: "attendanceRecord",
-        method: "getAttendanceRecord",
+        method: "get employee attendanceRecord",
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: `catch error: ${error?.message}`,
+        msg: `catch error: ${error?.msg}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -92,7 +90,7 @@ const allEmployeeAttendance = async (req, res) => {
     if (!year || !empId) {
       throw new BadRequest();
     }
-    const fetchedRecords = await AttendanceRecord.findAll({
+    const fetchedRecords = await Attendance.findAll({
       offset: parseInt(skip),
       limit: parseInt(limit),
       where: {
@@ -101,7 +99,6 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
-
     if (isEmpty(fetchedRecords)) {
       throw new NotFound();
     }
@@ -110,29 +107,40 @@ const allEmployeeAttendance = async (req, res) => {
       const empId = fetchedRecords[i].empId;
       if (!processedIds[empId]) {
         processedIds[empId] = true;
-        const currentEmployeeData = {
-          empId: empId,
-          data: [],
-        };
-        for (let j = 0; j < 12; j++) {
-          const newAttendance = fetchedRecords.filter(
-            (data) =>
-              data.empId === empId && new Date(data.createdAt).getMonth() === j
-          );
-          const month = monthNames[j];
-          const daysInMonth = new Date(year, j + 1, 0).getDate();
-          const weekendsDaysInMonth = getWeekend(daysInMonth, j, year);
-          const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
-          const employeePresentDays = newAttendance.length;
-          if (weekdaysInMonth || employeePresentDays) {
-            currentEmployeeData.data.push({
-              month: month,
-              presentDays: employeePresentDays,
-              workingDays: weekdaysInMonth,
-            });
+        const employeeData = await Employee.findAll({
+          where: {
+            empId: empId,
+          },
+        });
+
+        for (let user = 0; user < employeeData.length; user++) {
+          const name = employeeData[user].userName;
+          const currentEmployeeData = {
+            empId: empId,
+            name: name,
+            data: [],
+          };
+          for (let j = 0; j < 12; j++) {
+            const newAttendance = fetchedRecords.filter(
+              (data) =>
+                data.empId === empId &&
+                new Date(data.createdAt).getMonth() === j
+            );
+            const month = monthNames[j];
+            const daysInMonth = new Date(year, j + 1, 0).getDate();
+            const weekendsDaysInMonth = getWeekend(daysInMonth, j, year);
+            const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
+            const employeePresentDays = newAttendance.length;
+            if (weekdaysInMonth || employeePresentDays) {
+              currentEmployeeData.data.push({
+                month: month,
+                presentDays: employeePresentDays,
+                workingDays: weekdaysInMonth,
+              });
+            }
           }
+          allEmployeeAttendanceRecords.push(currentEmployeeData);
         }
-        allEmployeeAttendanceRecords.push(currentEmployeeData);
       }
     }
     res.status(HttpStatusCode.OK).json({
@@ -164,7 +172,7 @@ const allEmployeeAttendance = async (req, res) => {
     res.status(HttpStatusCode.BAD_REQUEST).json({
       status: false,
       message: "error",
-      error: error.message,
+      error: error?.message,
     });
   }
 };
