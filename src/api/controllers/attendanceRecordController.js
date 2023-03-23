@@ -65,7 +65,7 @@ const getAttendanceRecord = async (req, res) => {
         method: "get employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
+        empId: `employeeId: ${empId}`,
         msg: "employess attendance record",
       }
     );
@@ -76,8 +76,8 @@ const getAttendanceRecord = async (req, res) => {
         method: "get employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "catch error" + error?.msg,
+        empId: `employeeId: ${empId}`,
+        msg: `catch error: ${error?.msg}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -99,6 +99,9 @@ const allEmployeeAttendance = async (req, res) => {
         },
       },
     });
+    if (isEmpty(fetchedRecords)) {
+      throw new NotFound();
+    }
     const processedIds = {};
     for (let i = 0; i < fetchedRecords.length; i++) {
       const empId = fetchedRecords[i].empId;
@@ -151,7 +154,7 @@ const allEmployeeAttendance = async (req, res) => {
         method: "get all employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
+        empId: `employeeId: ${empId}`,
         msg: "get all employee attendance record",
       }
     );
