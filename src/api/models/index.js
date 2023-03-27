@@ -10,6 +10,7 @@ db.globalTypeCategory = require("./globalTypeCategory")(sequelize, DataTypes);
 db.globalType = require("./globalType")(sequelize, DataTypes);
 db.employee = require("./employee")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
+db.projectsName = require("./projectsName")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 
 // fs.readdirSync(__dirname).forEach((file) => {
@@ -19,6 +20,8 @@ db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 //     sequelize, DataTypes;
 //   }
 // });
+db.employeeDsr.belongsTo(db.projectsName, { foreignKey: "projectId" });
+
 sequelize.sync().then(() => {
   console.log("sync is done");
 });

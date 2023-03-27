@@ -2,15 +2,35 @@ const db = require("../models/index");
 const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
 const employee = db.employeeDsr;
+const ProjectsName = db.projectsName;
 const HttpStatusCode = require("../../enums/httpErrorCodes");
 const { BadRequest, NotFound } = require("../../helper/apiErros");
 
 const { Op } = require("sequelize");
+
 const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;
   const { empId } = req?.query;
 
   try {
+    const dsrAlreadyExist = await employee.findAll({
+      where: {
+        empId,
+      },
+    });
+
+    for (let i = 0; i < dsrAlreadyExist?.length; i++) {
+      const singleDsr = dsrAlreadyExist[i];
+
+      for (let j = 0; j < employeeDSRdata?.length; j++) {
+        if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
+          res
+            .status(HttpStatusCode?.BAD_REQUEST)
+            .json({ error: "DSR already exist" });
+        }
+      }
+    }
+
     if (!employeeDSRdata) {
       0;
       throw new BadRequest();
@@ -18,6 +38,7 @@ const employeeDsr = async (req, res) => {
     let isCreated;
     for (let i = 0; i < employeeDSRdata.length; i++) {
       const currentEmployeeDSR = employeeDSRdata[i];
+
       isCreated = await employee.create({
         empId: empId.toUpperCase(),
         projectId: currentEmployeeDSR?.projectId,
@@ -66,12 +87,17 @@ const getEmployeeDsr = async (req, res) => {
       throw new BadRequest();
     }
     const isExists = await employee.findAll({
+      include: [
+        {
+          model: ProjectsName,
+          attributes: ["projectName"],
+        },
+      ],
       offset: parseInt(skip),
       limit: parseInt(limit - skip),
-      where: {
-        empId,
-      },
+      order: [["workingDate", "DESC"]],
     });
+
     const totalCount = await employee.findAll({});
 
     if (isEmpty(isExists)) {
@@ -231,7 +257,11 @@ const updateEmployeeDsr = async (req, res) => {
         msg: "Catch error:" + error?.msg,
       }
     );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });
+    res.status(HttpStatusCode?.BAD_REQUEST).json({
+      status: false,
+      message: error?.message,
+      statusCode: error?.httpCode,
+    });
   }
 };
 const filterEmployeeDsr = async (req, res) => {
@@ -250,6 +280,12 @@ const filterEmployeeDsr = async (req, res) => {
     }
     if (taskDetail && startDate && endDate) {
       var isExists = await employee.findAll({
+        include: [
+          {
+            model: ProjectsName,
+            attributes: ["projectName"],
+          },
+        ],
         offset: parseInt(skip),
         limit: parseInt(limit - skip),
         where: {
@@ -258,9 +294,16 @@ const filterEmployeeDsr = async (req, res) => {
             [Op.between]: [startDate, endDate],
           },
         },
+        order: [["workingDate", "DESC"]],
       });
     } else if (taskDetail) {
       var isExists = await employee.findAll({
+        include: [
+          {
+            model: ProjectsName,
+            attributes: ["projectName"],
+          },
+        ],
         offset: parseInt(skip),
         limit: parseInt(limit - skip),
         where: {
@@ -269,6 +312,12 @@ const filterEmployeeDsr = async (req, res) => {
       });
     } else if (startDate && endDate) {
       var isExists = await employee.findAll({
+        include: [
+          {
+            model: ProjectsName,
+            attributes: ["projectName"],
+          },
+        ],
         offset: parseInt(skip),
         limit: parseInt(limit - skip),
         where: {
@@ -276,6 +325,7 @@ const filterEmployeeDsr = async (req, res) => {
             [Op.between]: [startDate, endDate],
           },
         },
+        order: [["workingDate", "DESC"]],
       });
     }
     if (taskDetail && startDate && endDate) {
