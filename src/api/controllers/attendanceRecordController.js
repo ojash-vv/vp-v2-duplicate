@@ -108,12 +108,23 @@ const allEmployeeAttendance = async (req, res) => {
       },
     });
     if (isEmpty(fetchedRecords)) {
+      logger.error(
+        {
+          controller: "attendanceRecord",
+          method: "get all employee attendanceRecord",
+        },
+        {
+          empId: "employeeId" + empId,
+          msg: "employee Attendance Doesn't exist",
+        }
+      );
       res.status(HttpStatusCode.NOT_FOUND).json({
         status: false,
         message: "Not found",
         error: MessageTag.ATTENDANCE_NOT_FOUND,
         statusCode: HttpStatusCode.NOT_FOUND,
       });
+      return;
     }
 
     const processedIds = {};
