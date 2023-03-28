@@ -32,7 +32,7 @@ const masterGlobalType = async (req, res) => {
         },
         {
           payload: category,
-          msg: "Global type categoey not exists.....",
+          msg: "Global type category not exists.....",
         }
       );
       res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
