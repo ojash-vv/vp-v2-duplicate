@@ -20,23 +20,24 @@ const {
   getAttendanceRecord,
   allEmployeeAttendance,
 } = require("../controllers/attendanceRecordController");
+const { isUserAuthenticated } = require("../middleware/auth-middleware");
 
 /*------employee list route-----------*/
-router.get("/", getListOfEmployees);
-router.post("/", addNewEmployee);
-router.patch("/", updateEmployeeData);
-router.delete("/:userId/:empId", deleteEmployee);
-router.post("/markAttendance", markAttendance);
-router.get("/getNewEmpId", getNewEmpId);
+router.get("/", isUserAuthenticated, getListOfEmployees);
+router.post("/", isUserAuthenticated, addNewEmployee);
+router.patch("/", isUserAuthenticated, updateEmployeeData);
+router.delete("/:userId/:empId", isUserAuthenticated, deleteEmployee);
+router.post("/markAttendance", isUserAuthenticated, markAttendance);
+router.get("/getNewEmpId", isUserAuthenticated, getNewEmpId);
 
 /*------employDsr route-----------*/
-router.post("/employeeDsr", employeeDsr);
-router.get("/get-EmployeeDsr", getEmployeeDsr);
-router.get("/getSingle-EmployeeDsr", getSingleEmployeeDsr);
-router.patch("/update-EmployeeDsr", updateEmployeeDsr);
-router.get("/filter-EmployeeDsr", filterEmployeeDsr);
+router.post("/employeeDsr", isUserAuthenticated, employeeDsr);
+router.get("/get-EmployeeDsr", isUserAuthenticated, getEmployeeDsr);
+router.get("/getSingle-EmployeeDsr", isUserAuthenticated, getSingleEmployeeDsr);
+router.patch("/update-EmployeeDsr", isUserAuthenticated, updateEmployeeDsr);
+router.get("/filter-EmployeeDsr", isUserAuthenticated, filterEmployeeDsr);
 
 /*----------------attendanceRecord----------------*/
-router.get("/attendance-record", getAttendanceRecord);
-router.get("/allAttendance-record", allEmployeeAttendance);
+router.get("/attendance-record", isUserAuthenticated, getAttendanceRecord);
+router.get("/allAttendance-record", isUserAuthenticated, allEmployeeAttendance);
 module.exports = router;

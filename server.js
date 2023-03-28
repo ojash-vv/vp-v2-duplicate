@@ -2,6 +2,7 @@ const http = require("http");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+
 const {
   authRoute,
   roleRoute,
@@ -10,15 +11,11 @@ const {
   employeeRoute,
 } = require("./src/api/routes/index");
 
-//middleware
-app.use(express.json());
-app.use((req, res, next) => {
-  next();
-});
-
 const httpServer = http.createServer(app);
 
 const startServer = (port) => {
+  //middleware
+  app.use(express.json());
   app.use("*", cors());
   app.use("/api/v1/role/", roleRoute);
   app.use("/api/v1/auth/", authRoute);
