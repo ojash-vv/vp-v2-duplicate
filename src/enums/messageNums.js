@@ -25,6 +25,7 @@ const MessageTag = {
   CONTENT_NOT_FOUND: "Content can not be empty!",
   EMAIL_EXISTS: "Email already exists",
   EMPLOYEE_ID_EXISTS: "Employee ID already exists",
+  ATTENDANCE_NOT_FOUND: "Data doesn't exist",
 };
 
 module.exports = MessageTag;

@@ -3,7 +3,7 @@ const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
 const EmployeeDsr = db.employeeDsr;
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest, NotFound } = require("../../helper/apiErros");
+const { BadRequest, NotFound } = require("../../helper/apiErrors");
 const { Op } = require("sequelize");
 const employeeDsr = async (req, res) => {
   const employeeDSRdata = req?.body;

@@ -1,7 +1,8 @@
 const db = require("../models/index");
 const { Op } = require("sequelize");
+const MessageTag = require("../../enums/messageNums");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest, NotFound } = require("../../helper/apiErros");
+const { BadRequest, NotFound } = require("../../helper/apiErrors");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
@@ -48,7 +49,7 @@ const getAttendanceRecord = async (req, res) => {
       const employeePresentDays = newAttendance.length;
       if (weekdaysInMonth || employeePresentDays) {
         employeeName.data.push(month, {
-          presenDays: employeePresentDays,
+          presentDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         });
       }
@@ -66,7 +67,7 @@ const getAttendanceRecord = async (req, res) => {
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: "employess attendance record",
+        msg: "employee attendance record",
       }
     );
   } catch (error) {
@@ -92,7 +93,14 @@ const allEmployeeAttendance = async (req, res) => {
     }
     const fetchedRecords = await Attendance.findAll({
       offset: parseInt(skip),
-      limit: parseInt(limit),
+      limit: parseInt(limit - skip),
+      where: {
+        createdAt: {
+          [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
+        },
+      },
+    });
+    const totalCount = await Attendance.findAll({
       where: {
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
@@ -100,8 +108,14 @@ const allEmployeeAttendance = async (req, res) => {
       },
     });
     if (isEmpty(fetchedRecords)) {
-      throw new NotFound();
+      res.status(HttpStatusCode.NOT_FOUND).json({
+        status: false,
+        message: "Not found",
+        error: MessageTag.ATTENDANCE_NOT_FOUND,
+        statusCode: HttpStatusCode.NOT_FOUND,
+      });
     }
+
     const processedIds = {};
     for (let i = 0; i < fetchedRecords.length; i++) {
       const empId = fetchedRecords[i].empId;
@@ -146,7 +160,10 @@ const allEmployeeAttendance = async (req, res) => {
     res.status(HttpStatusCode.OK).json({
       status: true,
       message: "success",
-      data: allEmployeeAttendanceRecords,
+      data: {
+        attendanceList: allEmployeeAttendanceRecords,
+        totalCount: totalCount?.length,
+      },
     });
     logger.info(
       {

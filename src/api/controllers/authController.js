@@ -9,7 +9,7 @@ const Auth = db.auth;
 const RolePermissions = db.roleAndPermissions;
 const GlobalType = db.globalType;
 const jwt = require("jsonwebtoken");
-const { APIError } = require("../../helper/apiErros");
+const { APIError } = require("../../helper/apiErrors");
 require("dotenv").config();
 
 function generateAccessToken(user) {

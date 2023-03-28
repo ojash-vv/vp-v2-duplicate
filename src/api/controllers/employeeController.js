@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const MessageTag = require("../../enums/messageNums");
 const db = require("../models/index");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { APIError, BadRequest, NotFound } = require("../../helper/apiErros");
+const { APIError, BadRequest, NotFound } = require("../../helper/apiErrors");
 const { logger } = require("../../helper/logger");
 const Employee = db.employee;
 
