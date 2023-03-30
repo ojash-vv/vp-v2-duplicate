@@ -35,6 +35,7 @@ const MessageTag = {
 
   EMAIL_EXISTS: "Email already exists",
   EMPLOYEE_ID_EXISTS: "Employee ID already exists",
+  INVALID_TOKEN: "Invalid token",
 };
 
 module.exports = MessageTag;
