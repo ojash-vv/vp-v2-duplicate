@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       workingDate: DataTypes.STRING,
-      workingHours: DataTypes.STRING,
+      workingHours: DataTypes.INTEGER,
       taskDetail: {
         type: DataTypes.STRING,
         required: true,
