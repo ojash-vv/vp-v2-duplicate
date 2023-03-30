@@ -11,6 +11,7 @@ db.globalType = require("./globalType")(sequelize, DataTypes);
 db.employee = require("./employee")(sequelize, DataTypes);
 db.employeeAttendance = require("./attendance")(sequelize, DataTypes);
 db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
+db.events = require("./events")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 

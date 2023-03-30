@@ -27,6 +27,12 @@ const MessageTag = {
 
   LEAVE_EXIST: "Leave already applied for this date.",
   LEAVE_MARK: "Leave Marked!",
+  LEAVE_UPDATED: "Leave Updated!",
+
+  EVENT_EXIST: "Event already added for this date.",
+  EVENT_MARKED: "Event Added!",
+  EVENT_UPDATED: "Event Updated!",
+
   EMAIL_EXISTS: "Email already exists",
   EMPLOYEE_ID_EXISTS: "Employee ID already exists",
 };

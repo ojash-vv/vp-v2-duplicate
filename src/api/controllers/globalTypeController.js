@@ -3,6 +3,7 @@ const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
 const ObjectHelper = require("../../helper");
+const sequelize = require("sequelize");
 
 const GlobalType = db.globalType;
 const GlobalTypeCategory = db.globalTypeCategory;
@@ -21,7 +22,12 @@ const masterGlobalType = async (req, res) => {
   try {
     const result = await GlobalType.findAll({
       where: {
-        GlobalTypeCategory_uniqeValue: category,
+        where: sequelize.where(
+          sequelize.col("GlobalTypeCategory_uniqeValue"),
+          "=",
+          category
+        ),
+        $and: sequelize.where(sequelize.col("isActive"), "=", "1"),
       },
     });
     if (isEmpty(result)) {

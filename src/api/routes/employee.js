@@ -22,7 +22,9 @@ const {
 } = require("../controllers/attendanceRecordController");
 const {
   markLeave,
+  updateLeave,
   getEmployeeLeave,
+  getEmployeeDayLeave,
 } = require("../controllers/leaveController");
 
 /*------employee list route-----------*/
@@ -46,6 +48,9 @@ router.get("/allAttendance-record", allEmployeeAttendance);
 
 /*******************Employee Leave********************/
 router.post("/markLeave", markLeave);
+router.put("/updateLeave/:id", updateLeave);
+
 router.get("/allEmployee-leave", getEmployeeLeave);
+router.get("/allEmployeeDay-leave", getEmployeeDayLeave);
 
 module.exports = router;
