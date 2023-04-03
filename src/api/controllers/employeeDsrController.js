@@ -3,8 +3,9 @@ const { isEmpty } = require("lodash");
 const { logger } = require("../../helper/logger");
 const employee = db.employeeDsr;
 const ProjectsName = db.projectsName;
+const MessageTag = require("../../enums/messageNums");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest, NotFound } = require("../../helper/apiErros");
+const { APIError, BadRequest, NotFound } = require("../../helper/apiErros");
 
 const { Op } = require("sequelize");
 
@@ -24,9 +25,12 @@ const employeeDsr = async (req, res) => {
 
       for (let j = 0; j < employeeDSRdata?.length; j++) {
         if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
-          res
-            .status(HttpStatusCode?.BAD_REQUEST)
-            .json({ error: "DSR already exist" });
+          throw new APIError(
+            "DSREXIST",
+            HttpStatusCode.BAD_REQUEST,
+            false,
+            MessageTag.DSR_EXIST
+          );
         }
       }
     }
@@ -52,9 +56,12 @@ const employeeDsr = async (req, res) => {
         createdAt: new Date(),
       });
     }
-    res
-      .status(HttpStatusCode.OK)
-      .json({ status: true, message: "success", data: isCreated });
+    res.status(HttpStatusCode.OK).json({
+      status: true,
+      message: "success",
+      data: isCreated,
+      statusCode: HttpStatusCode.OK,
+    });
     logger.info(
       {
         controller: "employeeDsrController --->",
@@ -76,7 +83,18 @@ const employeeDsr = async (req, res) => {
         msg: "Catch error: " + error?.msg,
       }
     );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message });
+    if (error?.httpCode) {
+      res.status(error?.httpCode).json({
+        status: error?.isOperational,
+        message: error?.message,
+        statusCode: error?.httpCode,
+      });
+    }
+    res.status(HttpStatusCode?.BAD_REQUEST).json({
+      status: false,
+      message: error?.message,
+      statusCode: HttpStatusCode.BAD_REQUEST,
+    });
   }
 };
 
@@ -257,11 +275,13 @@ const updateEmployeeDsr = async (req, res) => {
         msg: "Catch error:" + error?.msg,
       }
     );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({
-      status: false,
-      message: error?.message,
-      statusCode: error?.httpCode,
-    });
+    if (error?.httpCode) {
+      res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+        status: error?.isOperational || false,
+        message: error?.message,
+        statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+      });
+    }
   }
 };
 const filterEmployeeDsr = async (req, res) => {
