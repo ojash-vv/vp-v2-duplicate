@@ -25,7 +25,7 @@ module.exports = (sequalize, DataTypes) => {
     {
       tableName: "attendance_record",
       updatedAt: false,
-    }
-  );
-  return AttendanceRecord;
-};
+    },
+  )
+  return AttendanceRecord
+}
