@@ -41,8 +41,8 @@ const loginUser = async (req, res) => {
         const isPasswordMatch = await bcrypt.compare(password, hashedPassword)
         if (isPasswordMatch) {
           const userRoles = {}
-          const token = generateAccessToken({ email })
           const userRole = isExists?.userRole
+          const token = generateAccessToken({ email, userRole })
           try {
             const listOfPermissions = await RolePermissions.findAll({
               where: {
