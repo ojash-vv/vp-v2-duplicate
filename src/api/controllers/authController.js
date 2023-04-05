@@ -1,5 +1,4 @@
-/* eslint-disable no-await-in-loop */
-/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
+
 const { isEmpty } = require("lodash")
 const bcrypt = require("bcryptjs")
 const validator = require("validator")

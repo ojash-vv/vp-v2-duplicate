@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const db = require("../models/index");
 const { Op } = require("sequelize");
 const MessageTag = require("../../enums/messageNums");
@@ -9,19 +8,6 @@ const monthNames = require("../../enums/monthName");
 const { isEmpty } = require("lodash");
 const Attendance = db.attendanceRecord;
 const Employee = db.employee;
-=======
-/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
-const { Op } = require("sequelize")
-const { isEmpty } = require("lodash")
-const db = require("../models/index")
-const HttpStatusCode = require("../../enums/httpErrorCodes")
-const { BadRequest, NotFound } = require("../../helper/apiErrors")
-const { logger } = require("../../helper/logger")
-const monthNames = require("../../enums/monthName")
-
-const Attendance = db.attendanceRecord
-const Employee = db.employee
->>>>>>> c42ef9c4ff1c6f9a302beb28ee50016a38b37a54
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = []
   for (let day = 1; day <= daysInMonth; day++) {
@@ -81,15 +67,9 @@ const getAttendanceRecord = async (req, res) => {
       },
       {
         empId: `employeeId: ${empId}`,
-<<<<<<< HEAD
-        msg: "employee attendance record",
-      }
-    );
-=======
         msg: "employees attendance record",
       },
     )
->>>>>>> c42ef9c4ff1c6f9a302beb28ee50016a38b37a54
   } catch (error) {
     logger.error(
       {
@@ -112,7 +92,6 @@ const allEmployeeAttendance = async (req, res) => {
       throw new BadRequest()
     }
     const fetchedRecords = await Attendance.findAll({
-<<<<<<< HEAD
       offset: parseInt(skip),
       limit: parseInt(limit - skip),
       where: {
@@ -122,10 +101,6 @@ const allEmployeeAttendance = async (req, res) => {
       },
     });
     const totalCount = await Attendance.findAll({
-=======
-      offset: parseInt(skip, 10),
-      limit: parseInt(limit, 10),
->>>>>>> c42ef9c4ff1c6f9a302beb28ee50016a38b37a54
       where: {
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
@@ -133,7 +108,6 @@ const allEmployeeAttendance = async (req, res) => {
       },
     })
     if (isEmpty(fetchedRecords)) {
-<<<<<<< HEAD
       logger.error(
         {
           controller: "attendanceRecord",
@@ -154,11 +128,6 @@ const allEmployeeAttendance = async (req, res) => {
     }
 
     const processedIds = {};
-=======
-      throw new NotFound()
-    }
-    const processedIds = {}
->>>>>>> c42ef9c4ff1c6f9a302beb28ee50016a38b37a54
     for (let i = 0; i < fetchedRecords.length; i++) {
       const { newEmpId } = fetchedRecords[i]
       if (!processedIds[empId]) {
@@ -201,16 +170,11 @@ const allEmployeeAttendance = async (req, res) => {
     res.status(HttpStatusCode.OK).json({
       status: true,
       message: "success",
-<<<<<<< HEAD
       data: {
         attendanceList: allEmployeeAttendanceRecords,
         totalCount: totalCount?.length,
       },
     });
-=======
-      data: allEmployeeAttendanceRecords,
-    })
->>>>>>> c42ef9c4ff1c6f9a302beb28ee50016a38b37a54
     logger.info(
       {
         controller: "attendanceRecord",
