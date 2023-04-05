@@ -13,7 +13,7 @@ db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 db.staticContent = require("./staticContent")(sequelize, DataTypes);
 sequelize.sync().then(() => {
-  console.log("sync is done");
-});
+  console.log("sync is done")
+})
 
-module.exports = db;
+module.exports = db

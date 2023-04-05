@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "role_permissions",
-    }
-  );
-  return RolePermissions;
-};
+    },
+  )
+  return RolePermissions
+}

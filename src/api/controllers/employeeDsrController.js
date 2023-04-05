@@ -6,15 +6,15 @@ const HttpStatusCode = require("../../enums/httpErrorCodes");
 const { BadRequest, NotFound } = require("../../helper/apiErrors");
 const { Op } = require("sequelize");
 const employeeDsr = async (req, res) => {
-  const employeeDSRdata = req?.body;
-  const empId = employeeDSRdata.empId;
+  const employeeDSRdata = req?.body
+  const { empId } = employeeDSRdata
   try {
     if (!employeeDSRdata && !empId) {
-      throw new BadRequest();
+      throw new BadRequest()
     }
-    let isCreated;
+    let isCreated
     for (let i = 0; i < employeeDSRdata.length; i++) {
-      const currentEmployeeDSR = employeeDSRdata[i];
+      const currentEmployeeDSR = employeeDSRdata[i]
       isCreated = await EmployeeDsr.create({
         empId: currentEmployeeDSR?.empId.toUpperCase(),
         projectId: currentEmployeeDSR?.projectId,
@@ -24,11 +24,9 @@ const employeeDsr = async (req, res) => {
         taskStatus: currentEmployeeDSR?.taskStatus,
         createdBy: "1",
         createdAt: new Date(),
-      });
+      })
     }
-    res
-      .status(HttpStatusCode.OK)
-      .json({ status: true, message: "success", data: isCreated });
+    res.status(HttpStatusCode.OK).json({ status: true, message: "success", data: isCreated })
     logger.info(
       {
         controller: "employeeDsrController --->",
@@ -37,8 +35,8 @@ const employeeDsr = async (req, res) => {
       {
         payload: isCreated,
         msg: "employeeDsr added",
-      }
-    );
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -46,48 +44,48 @@ const employeeDsr = async (req, res) => {
         method: "employeeDsr --->",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "Catch error: " + error?.msg,
-      }
-    );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message });
+        empId: `employeeId${empId}`,
+        msg: `Catch error: ${error?.msg}`,
+      },
+    )
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ error: error?.message })
   }
-};
+}
 
 const getEmployeeDsr = async (req, res) => {
-  const { skip = 0, limit = 0, empId } = req?.query;
+  const { skip = 0, limit = 0, empId } = req.query
   try {
     if (!empId) {
-      throw new BadRequest();
+      throw new BadRequest()
     }
     const isExists = await EmployeeDsr.findAll({
-      offset: parseInt(skip),
-      limit: parseInt(limit - skip),
+      offset: parseInt(skip, 10),
+      limit: parseInt(limit - skip, 10),
       where: {
         empId,
       },
-    });
-    const totalCount = await EmployeeDsr.findAll({});
+    })
+    const totalCount = await EmployeeDsr.findAll({})
 
     if (isEmpty(isExists)) {
-      throw new NotFound();
+      throw new NotFound()
     }
     if (isExists) {
       res.status(HttpStatusCode.OK).json({
         status: true,
         message: "success",
         data: { dsrList: isExists, totalCount: totalCount?.length },
-      });
+      })
       logger.info(
         {
           controller: "employeeDsrController --->",
           method: "getEmployeeDsr --->",
         },
         {
-          empId: "employeeId" + empId,
+          empId: `employeeId${empId}`,
           msg: "employeeDsr data ",
-        }
-      );
+        },
+      )
     }
   } catch (error) {
     logger.error(
@@ -96,43 +94,43 @@ const getEmployeeDsr = async (req, res) => {
         method: "getEmployeeDsr --->",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "Catch error: " + error?.msg,
-      }
-    );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
+        empId: `employeeId${empId}`,
+        msg: `Catch error: ${error?.msg}`,
+      },
+    )
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message })
   }
-};
+}
 
 const getSingleEmployeeDsr = async (req, res) => {
-  const { id, empId } = req?.query;
+  const { id, empId } = req.query
   try {
     if (!id || !empId) {
-      throw new BadRequest();
+      throw new BadRequest()
     }
     const isEmployeeExists = await EmployeeDsr.findOne({
       where: {
-        id: id,
+        id,
       },
-    });
+    })
     if (isEmpty(isEmployeeExists)) {
-      throw new NotFound();
+      throw new NotFound()
     }
     res.status(HttpStatusCode.OK).send({
       status: true,
       data: isEmployeeExists,
       message: "success",
-    });
+    })
     logger.info(
       {
         controller: "employeeDsrController --->",
         method: "getSingleEmployeeDsr---------->",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "EmployeeDsr data" + empId,
-      }
-    );
+        empId: `employeeId${empId}`,
+        msg: `EmployeeDsr data${empId}`,
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -140,27 +138,17 @@ const getSingleEmployeeDsr = async (req, res) => {
         method: "getSingleEmployeeDsr---------->",
       },
       {
-        empId: "employId: " + empId,
-        msg: "Catch error:" + error?.msg,
-      }
-    );
-    res
-      .status(HttpStatusCode?.BAD_REQUEST)
-      .json({ message: "user doesn't exist" });
+        empId: `employId: ${empId}`,
+        msg: `Catch error:${error?.msg}`,
+      },
+    )
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: "user doesn't exist" })
   }
-};
+}
 
 const updateEmployeeDsr = async (req, res) => {
-  const {
-    id,
-    empId,
-    projectId,
-    workingDate,
-    workingHours,
-    taskDetail,
-    taskStatus,
-    taskMinutes,
-  } = req?.body;
+  const { id, empId, projectId, workingDate, workingHours, taskDetail, taskStatus, taskMinutes } =
+    req.body
   try {
     if (
       !id ||
@@ -172,39 +160,39 @@ const updateEmployeeDsr = async (req, res) => {
       !taskStatus ||
       !taskMinutes
     ) {
-      throw new BadRequest();
+      throw new BadRequest()
     }
     const getUpdateEmployee = await EmployeeDsr.findOne({
       where: {
-        id: id,
+        id,
       },
-    });
+    })
     if (isEmpty(getUpdateEmployee)) {
-      throw new NotFound();
+      throw new NotFound()
     }
     const isUpdated = await EmployeeDsr.update(
       {
-        empId: empId,
-        projectId: projectId,
-        workingDate: workingDate,
-        workingHours: workingHours,
-        taskDetail: taskDetail,
-        taskStatus: taskStatus,
-        taskMinutes: taskMinutes,
+        empId,
+        projectId,
+        workingDate,
+        workingHours,
+        taskDetail,
+        taskStatus,
+        taskMinutes,
         updatedBy: "1",
         updatedAt: new Date(),
       },
       {
         where: {
-          id: id,
+          id,
         },
-      }
-    );
+      },
+    )
     res.status(HttpStatusCode.OK).send({
       status: true,
       message: "updated successfully",
       data: isUpdated,
-    });
+    })
     logger.info(
       {
         controller: "employeeDsrController --->",
@@ -212,9 +200,9 @@ const updateEmployeeDsr = async (req, res) => {
       },
       {
         payload: isUpdated,
-        msg: "EmployeeDsr updated,employeeId: " + empId,
-      }
-    );
+        msg: `EmployeeDsr updated,employeeId: ${empId}`,
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -222,101 +210,96 @@ const updateEmployeeDsr = async (req, res) => {
         method: "updateEmployeeDsr---------->",
       },
       {
-        empId: "employeeId:" + empId,
-        msg: "Catch error:" + error?.msg,
-      }
-    );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages });
+        empId: `employeeId:${empId}`,
+        msg: `Catch error:${error?.msg}`,
+      },
+    )
+    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.messages })
   }
-};
+}
 
 const filterEmployeeDsr = async (req, res) => {
-  const {
-    skip = 0,
-    limit = 0,
-    empId,
-    taskDetail,
-    startDate,
-    endDate,
-  } = req?.query;
+  const { skip = 0, limit = 0, empId, taskDetail, startDate, endDate } = req.query
+  let getFilterData = []
+  let totalFilterData = []
 
   try {
     if (!empId) {
-      throw new BadRequest();
+      throw new BadRequest()
     }
     if (taskDetail && startDate && endDate) {
-      var getFilterData = await EmployeeDsr.findAll({
-        offset: parseInt(skip),
-        limit: parseInt(limit - skip),
+      getFilterData = await EmployeeDsr.findAll({
+        offset: parseInt(skip, 10),
+        limit: parseInt(limit - skip, 10),
         where: {
-          taskDetail: taskDetail,
+          taskDetail,
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-      });
+      })
     } else if (taskDetail) {
-      var getFilterData = await EmployeeDsr.findAll({
-        offset: parseInt(skip),
-        limit: parseInt(limit - skip),
+      getFilterData = await EmployeeDsr.findAll({
+        offset: parseInt(skip, 10),
+        limit: parseInt(limit - skip, 10),
         where: {
-          taskDetail: taskDetail,
+          taskDetail,
         },
-      });
+      })
     } else if (startDate && endDate) {
-      var getFilterData = await EmployeeDsr.findAll({
-        offset: parseInt(skip),
-        limit: parseInt(limit - skip),
+      getFilterData = await EmployeeDsr.findAll({
+        offset: parseInt(skip, 10),
+        limit: parseInt(limit - skip, 10),
         where: {
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-      });
+      })
     }
     if (taskDetail && startDate && endDate) {
-      var totalFilterData = await EmployeeDsr.findAll({
+      totalFilterData = await EmployeeDsr.findAll({
         where: {
-          taskDetail: taskDetail,
+          taskDetail,
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-      });
+      })
     } else if (taskDetail) {
-      var totalFilterData = await EmployeeDsr.findAll({
+      totalFilterData = await EmployeeDsr.findAll({
         where: {
-          taskDetail: taskDetail,
+          taskDetail,
         },
-      });
+      })
     } else if (startDate && endDate) {
-      var totalFilterData = await EmployeeDsr.findAll({
+      totalFilterData = await EmployeeDsr.findAll({
         where: {
           workingDate: {
             [Op.between]: [startDate, endDate],
           },
         },
-      });
+      })
     }
 
     if (isEmpty(getFilterData)) {
-      throw new NotFound();
+      throw new NotFound()
     }
     res.status(HttpStatusCode?.OK).json({
       status: true,
       message: "success",
       data: { dsrList: getFilterData, totalCount: totalFilterData?.length },
-    });
+    })
     logger.info(
       {
         controller: "employeeDsrController --->",
         method: "find taskDetail in employeeDsr",
       },
       {
-        payload: "employeeId:" + empId,
-        msg: "taskDetail :" + taskDetail,
-      }
-    );
+        payload: `employeeId:${empId}`,
+        msg: `taskDetail :${taskDetail}`,
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -324,17 +307,17 @@ const filterEmployeeDsr = async (req, res) => {
         method: "find taskDetail in employeeDsr",
       },
       {
-        payload: "employeeId: " + empId,
-        msg: "Catch error: " + error?.msg,
-      }
-    );
+        payload: `employeeId: ${empId}`,
+        msg: `Catch error: ${error?.msg}`,
+      },
+    )
     res.status(HttpStatusCode?.BAD_REQUEST).json({
       status: false,
       message: error?.message,
       statusCode: error?.httpCode,
-    });
+    })
   }
-};
+}
 
 module.exports = {
   employeeDsr,
@@ -342,4 +325,4 @@ module.exports = {
   getSingleEmployeeDsr,
   updateEmployeeDsr,
   filterEmployeeDsr,
-};
+}
