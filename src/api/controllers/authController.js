@@ -42,7 +42,8 @@ const loginUser = async (req, res) => {
         if (isPasswordMatch) {
           const userRoles = {}
           const userRole = isExists?.userRole
-          const token = generateAccessToken({ email, userRole })
+          const empId = isExists?.empId
+          const token = generateAccessToken({ email, userRole, empId })
           try {
             const listOfPermissions = await RolePermissions.findAll({
               where: {
