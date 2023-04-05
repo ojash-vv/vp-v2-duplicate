@@ -7,11 +7,10 @@ const db = require("../models/index")
 const { logger } = require("../../helper/logger")
 const HttpStatusCode = require("../../enums/httpErrorCodes")
 const MessageTag = require("../../enums/messageNums")
-
 const Auth = db.auth;
 const RolePermissions = db.roleAndPermissions;
 const GlobalType = db.globalType;
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const { Unauthorized, NotFound,APIError } = require("../../helper/apiErrors");
 require("dotenv").config();
 
