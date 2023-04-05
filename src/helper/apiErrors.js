@@ -1,4 +1,4 @@
-
+/* eslint-disable max-classes-per-file */
 const HttpStatusCode = require("../enums/httpErrorCodes")
 
 class BaseError extends Error {

@@ -1,4 +1,5 @@
-
+/* eslint-disable no-await-in-loop */
+/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
 const { isEmpty } = require("lodash")
 const bcrypt = require("bcryptjs")
 const validator = require("validator")
@@ -10,7 +11,6 @@ const MessageTag = require("../../enums/messageNums")
 const Auth = db.auth;
 const RolePermissions = db.roleAndPermissions;
 const GlobalType = db.globalType;
-// const jwt = require("jsonwebtoken");
 const { Unauthorized, NotFound,APIError } = require("../../helper/apiErrors");
 require("dotenv").config();
 

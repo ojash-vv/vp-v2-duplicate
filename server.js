@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const http = require("http")
 const express = require("express")
 const app = express()

@@ -1,13 +1,15 @@
-const db = require("../models/index");
-const { Op } = require("sequelize");
+/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
+const { Op } = require("sequelize")
+const { isEmpty } = require("lodash")
+const db = require("../models/index")
+const HttpStatusCode = require("../../enums/httpErrorCodes")
+const { BadRequest, NotFound } = require("../../helper/apiErrors")
+const { logger } = require("../../helper/logger")
+const monthNames = require("../../enums/monthName")
 const MessageTag = require("../../enums/messageNums");
-const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest, NotFound } = require("../../helper/apiErrors");
-const { logger } = require("../../helper/logger");
-const monthNames = require("../../enums/monthName");
-const { isEmpty } = require("lodash");
 const Attendance = db.attendanceRecord;
 const Employee = db.employee;
+
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = []
   for (let day = 1; day <= daysInMonth; day++) {
@@ -92,8 +94,8 @@ const allEmployeeAttendance = async (req, res) => {
       throw new BadRequest()
     }
     const fetchedRecords = await Attendance.findAll({
-      offset: parseInt(skip),
-      limit: parseInt(limit - skip),
+      offset: parseInt(skip, 10),
+      limit: parseInt(limit - skip, 10),
       where: {
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
@@ -132,7 +134,6 @@ const allEmployeeAttendance = async (req, res) => {
       const { newEmpId } = fetchedRecords[i]
       if (!processedIds[empId]) {
         processedIds[empId] = true
-        // eslint-disable-next-line no-await-in-loop
         const employeeData = await Employee.findAll({
           where: {
             newEmpId,
