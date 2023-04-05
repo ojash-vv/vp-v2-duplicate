@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "vp_users",
-    }
-  );
-  return VpUsers;
-};
+    },
+  )
+  return VpUsers
+}

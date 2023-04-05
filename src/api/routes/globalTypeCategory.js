@@ -1,17 +1,18 @@
-const express = require("express");
+const express = require("express")
 const {
   addGlobalTypeCategory,
   updateGlobalTypeCategory,
   deleteGlobalTypeCategory,
   getGlobalTypeCategory,
   updateStatusGlobalTypeCategory,
-} = require("../controllers/globalTypeCategoryController");
-const router = express.Router();
+} = require("../controllers/globalTypeCategoryController")
 
-router.post("/", addGlobalTypeCategory);
-router.put("/:id", updateGlobalTypeCategory);
-router.delete("/:id", deleteGlobalTypeCategory);
-router.get("/", getGlobalTypeCategory);
-router.put("/status/:id", updateStatusGlobalTypeCategory);
+const router = express.Router()
 
-module.exports = router;
+router.post("/", addGlobalTypeCategory)
+router.put("/:id", updateGlobalTypeCategory)
+router.delete("/:id", deleteGlobalTypeCategory)
+router.get("/", getGlobalTypeCategory)
+router.put("/status/:id", updateStatusGlobalTypeCategory)
+
+module.exports = router

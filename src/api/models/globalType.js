@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "globaltypes",
-    }
-  );
-  return GlobalType;
-};
+    },
+  )
+  return GlobalType
+}

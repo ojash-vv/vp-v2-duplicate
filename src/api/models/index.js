@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // const fs = require("fs");
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../config/db.config");
@@ -16,7 +17,7 @@ db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
 
 sequelize.sync().then(() => {
-  console.log("sync is done");
-});
+  console.log("sync is done")
+})
 
-module.exports = db;
+module.exports = db
