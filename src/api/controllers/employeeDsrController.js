@@ -26,8 +26,8 @@ const employeeDsr = async (req, res) => {
       for (let j = 0; j < employeeDSRdata?.length; j++) {
         if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
           throw new APIError(
-            "DSREXIST",
-            HttpStatusCode.BAD_REQUEST,
+            "Conflict",
+            HttpStatusCode.CONFLICT,
             false,
             MessageTag.DSR_EXIST
           );
@@ -83,17 +83,10 @@ const employeeDsr = async (req, res) => {
         msg: "Catch error: " + error?.msg,
       }
     );
-    if (error?.httpCode) {
-      res.status(error?.httpCode).json({
-        status: error?.isOperational,
-        message: error?.message,
-        statusCode: error?.httpCode,
-      });
-    }
-    res.status(HttpStatusCode?.BAD_REQUEST).json({
-      status: false,
+    res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+      status: error?.isOperational || false,
       message: error?.message,
-      statusCode: HttpStatusCode.BAD_REQUEST,
+      statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
     });
   }
 };
