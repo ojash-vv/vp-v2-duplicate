@@ -7,4 +7,4 @@ module.exports = {
   NOT_ALLOWED: 419,
   CONFLICT: 409,
   INTERNAL_SERVER: 500,
-};
+}

@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       tableName: "vp_users",
-    }
-  );
-  return Employee;
-};
+    },
+  )
+  return Employee
+}

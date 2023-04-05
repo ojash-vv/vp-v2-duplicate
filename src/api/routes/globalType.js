@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express")
 const {
   masterGlobalType,
   addGlobalType,
@@ -6,15 +6,15 @@ const {
   deleteGlobalType,
   getGlobalType,
   updateStatusGlobalType,
-} = require("../controllers/globalTypeController");
+} = require("../controllers/globalTypeController")
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/masterglobaltype/:category", masterGlobalType);
-router.post("/", addGlobalType);
-router.put("/:id", updateGlobalType);
-router.delete("/:id", deleteGlobalType);
-router.get("/", getGlobalType);
-router.put("/status/:id", updateStatusGlobalType);
+router.get("/masterglobaltype/:category", masterGlobalType)
+router.post("/", addGlobalType)
+router.put("/:id", updateGlobalType)
+router.delete("/:id", deleteGlobalType)
+router.get("/", getGlobalType)
+router.put("/status/:id", updateStatusGlobalType)
 
-module.exports = router;
+module.exports = router
