@@ -19,7 +19,14 @@ const {
 const {
   getAttendanceRecord,
   allEmployeeAttendance,
-} = require("../controllers/attendanceRecordController")
+} = require("../controllers/attendanceRecordController");
+const {
+  markLeave,
+  updateLeave,
+  getEmployeeLeave,
+  getEmployeeDayLeave,
+} = require("../controllers/leaveController");
+
 const { isUserAuthenticated } = require("../middleware/auth-middleware")
 
 /* ------employee list route-----------*/
@@ -36,7 +43,16 @@ router.get("/getSingle-EmployeeDsr", isUserAuthenticated, getSingleEmployeeDsr)
 router.patch("/update-EmployeeDsr", isUserAuthenticated, updateEmployeeDsr)
 router.get("/filter-EmployeeDsr", isUserAuthenticated, filterEmployeeDsr)
 
-/* ----------------attendanceRecord----------------*/
+/*----------------attendanceRecord----------------*/
+
 router.get("/attendance-record", isUserAuthenticated, getAttendanceRecord)
 router.get("/allAttendance-record", isUserAuthenticated, allEmployeeAttendance)
-module.exports = router
+
+/*******************Employee Leave********************/
+router.post("/markLeave", isUserAuthenticated, markLeave);
+router.put("/updateLeave/:id", isUserAuthenticated, updateLeave);
+
+router.get("/allEmployee-leave", isUserAuthenticated, getEmployeeLeave);
+router.get("/allEmployeeDay-leave", isUserAuthenticated, getEmployeeDayLeave);
+
+module.exports = router;

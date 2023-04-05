@@ -3,6 +3,7 @@ const MessageTag = {
   ValidEmail: "Please enter a valid email",
   WelcomeMsg: "Welcome to Virtuevise Portal!",
   PasswordWrong: "Password incorrect!",
+  NotFoundEmail: "User Not Found!",
 
   EXIST_GTC: "Category already exists!",
   GTC_NOT: "Category Not found!",
@@ -23,6 +24,15 @@ const MessageTag = {
 
   ERROR_OCCURRED: "Some error occurred while creating record!",
   CONTENT_NOT_FOUND: "Content can not be empty!",
+
+  LEAVE_EXIST: "Leave already applied for this date.",
+  LEAVE_MARK: "Leave Marked!",
+  LEAVE_UPDATED: "Leave Updated!",
+
+  EVENT_EXIST: "Event already added for this date.",
+  EVENT_MARKED: "Event Added!",
+  EVENT_UPDATED: "Event Updated!",
+
   EMAIL_EXISTS: "Email already exists",
   EMPLOYEE_ID_EXISTS: "Employee ID already exists",
   ATTENDANCE_NOT_FOUND: "Data doesn't exist",
