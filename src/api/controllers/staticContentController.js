@@ -1,6 +1,6 @@
 const { isEmpty } = require("lodash");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest } = require("../../helper/apiErrors");
+const { BadRequest,NotFound } = require("../../helper/apiErrors");
 const { logger } = require("../../helper/logger");
 const db = require("../models/index");
 const staticContent = db.staticContent;
@@ -10,28 +10,23 @@ const updateStaticContent = async (req, res) => {
     if (!empId || !title || !content) {
       throw new BadRequest();
     }
-    const checkExistContent = await staticContent.findAll({
+    const checkExistingContent = await staticContent.findAll({
       where: {
         title: title,
       },
     });
-    if (isEmpty(checkExistContent)) {
+    if (isEmpty(checkExistingContent)) {
       logger.error(
         {
-          controller: "updateTermsCondition",
-          method: "update term and condition",
+          controller:'staticContentController',
+          method: "updateStaticContent",
         },
         {
-          empId: "employeeId" + empId,
+          empId: `employId: ${empId}`,
           msg: "Content Doesn't exist",
         }
       );
-      res.status(HttpStatusCode?.NOT_FOUND).json({
-        status: false,
-        message: "Data doesn't exist",
-        statusCode: HttpStatusCode?.NOT_FOUND,
-      });
-      return;
+     throw new NotFound()
     } else {
       const updatedContent = await staticContent.update(
         {
@@ -53,24 +48,24 @@ const updateStaticContent = async (req, res) => {
       });
       logger.info(
         {
-          controller: "updateTermsCondition",
-          method: "update term and condition",
+          controller:'staticContentController',
+          method: "updateStaticContent",
         },
         {
           empId: "employeeId" + empId,
-          msg: "update term and condition",
+          msg: "static Content updated successfully",
         }
       );
     }
   } catch (error) {
     logger.error(
       {
-        controller: "updateTermsCondition",
-        method: "update term and condition",
+        controller:'staticContentController',
+        method: "updateStaticContent",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "Catch error" + error?.msg,
+        empId: `employId: ${empId}`,
+        msg: `Catch error:${error?.msg}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
@@ -78,11 +73,6 @@ const updateStaticContent = async (req, res) => {
 };
 
 const getStaticContent = async (req, res) => {
-  console.log(
-    "🚀 ~ file: StaticContentController.js:81 ~ getStaticContent ~ req:",
-    req?.query
-  );
-
   const { empId, title } = req?.query;
   try {
     if (!empId || !title) {
@@ -96,35 +86,30 @@ const getStaticContent = async (req, res) => {
     if (isEmpty(getContent)) {
       logger.error(
         {
-          controller: "getStaticContent",
-          method: "get static Content",
+          controller: "staticContentController",
+          method: "getStaticContent",
         },
         {
-          empId: "employeeId" + empId,
+          empId: `employId: ${empId}`,
           msg: "Content Doesn't exist",
         }
       );
-      res.status(HttpStatusCode?.NOT_FOUND).json({
-        status: false,
-        message: "Data doesn't exist",
-        statusCode: HttpStatusCode?.NOT_FOUND,
-      });
-      return;
+      throw new NotFound()
     }
     res.status(HttpStatusCode.OK).json({
       status: true,
-      message: "successfully get Content",
+      message: "successfully get staticContent",
       data: getContent,
       statusCode: HttpStatusCode.OK,
     });
     logger.info(
       {
-        controller: "getStaticContent",
-        method: "get static Content",
+        controller: "staticContentController",
+        method: "getStaticContent",
       },
       {
         empId: "employeeId" + empId,
-        msg: "get static content",
+        msg: "static content get successfully",
       }
     );
   } catch (error) {
@@ -134,8 +119,8 @@ const getStaticContent = async (req, res) => {
         method: "get static Content",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "Catch error" + error?.msg,
+        empId: `employId: ${empId}`,
+        msg: `Catch error:${error?.msg}`,
       }
     );
     res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });

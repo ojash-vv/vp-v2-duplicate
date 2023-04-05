@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // const fs = require("fs");
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../config/db.config");
