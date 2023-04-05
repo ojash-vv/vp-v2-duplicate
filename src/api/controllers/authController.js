@@ -108,7 +108,7 @@ const loginUser = async (req, res) => {
           throw new Unauthorized()
         }
       } else {
-        throw new NotFound(null, null, null, "User not found")
+        throw new NotFound("User not found");
       }
     } catch (error) {
       logger.error(
@@ -119,9 +119,9 @@ const loginUser = async (req, res) => {
         {
           payload: `Requested employee: ${email} `,
           msg: `error:${error}`,
-        },
-      )
-      if (error?.httpCode) {
+        }
+      );
+      if (error) {
         res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
           status: error?.isOperational || false,
           message: error?.message,
