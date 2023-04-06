@@ -2,6 +2,7 @@
 // const fs = require("fs");
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../../config/db.config");
+
 const db = {};
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
@@ -16,7 +17,6 @@ db.events = require("./events")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
 db.projectsName = require("./projectsName")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
-
 
 db.employeeDsr.belongsTo(db.projectsName, { foreignKey: "projectId" });
 
