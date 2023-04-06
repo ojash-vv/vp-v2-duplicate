@@ -14,7 +14,11 @@ db.employeeAttendance = require("./attendance")(sequelize, DataTypes);
 db.employeeLeave = require("./empLeave")(sequelize, DataTypes);
 db.events = require("./events")(sequelize, DataTypes);
 db.employeeDsr = require("./employeeDsr")(sequelize, DataTypes);
+db.projectsName = require("./projectsName")(sequelize, DataTypes);
 db.attendanceRecord = require("./attendanceRecord")(sequelize, DataTypes);
+
+
+db.employeeDsr.belongsTo(db.projectsName, { foreignKey: "projectId" });
 
 sequelize.sync().then(() => {
   console.log("sync is done")

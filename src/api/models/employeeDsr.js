@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         required: true,
         allowNull: false,
       },
-      workingDate: DataTypes.STRING,
-      workingHours: DataTypes.STRING,
+      workingDate: DataTypes.DATE,
+      workingHours: DataTypes.INTEGER,
       taskDetail: {
         type: DataTypes.STRING,
         required: true,
