@@ -1,7 +1,5 @@
-/* eslint-disable no-console */
 const http = require("http")
 const express = require("express")
-
 const app = express()
 const cors = require("cors")
 
@@ -11,6 +9,7 @@ const {
   globalTypeCategory,
   globalType,
   employeeRoute,
+  staticContent,
   eventRoute,
 } = require("./src/api/routes/index");
 
@@ -25,6 +24,7 @@ const startServer = (port) => {
   app.use("/api/v1/globaltypecategory/", globalTypeCategory)
   app.use("/api/v1/globaltype/", globalType)
   app.use("/api/v1/employee", employeeRoute)
+  app.use("/api/v1/staticContent", staticContent);
   app.use("/api/v1/event", eventRoute);
 
   httpServer.listen(port, () => {

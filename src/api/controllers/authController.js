@@ -8,12 +8,11 @@ const db = require("../models/index")
 const { logger } = require("../../helper/logger")
 const HttpStatusCode = require("../../enums/httpErrorCodes")
 const MessageTag = require("../../enums/messageNums")
-
-const Auth = db.auth
-const RolePermissions = db.roleAndPermissions
-const GlobalType = db.globalType
-const { Unauthorized, NotFound, APIError } = require("../../helper/apiErrors")
-require("dotenv").config()
+const Auth = db.auth;
+const RolePermissions = db.roleAndPermissions;
+const GlobalType = db.globalType;
+const { Unauthorized, NotFound,APIError } = require("../../helper/apiErrors");
+require("dotenv").config();
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1d" })

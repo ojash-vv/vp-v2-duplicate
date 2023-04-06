@@ -9,7 +9,7 @@ const isUserAuthenticated = (req, res, next) => {
     const authHeader = req?.headers?.authorization
     const jwtToken = authHeader && authHeader.split(" ")[1]
     if (jwtToken == null) throw new Unauthorized()
-    jwt.verify(jwtToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+     jwt.verify(jwtToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => { 
       if (err) {
         throw new APIError("Forbidden", HttpStatusCode.FORBIDDEN, false, MessageTag.INVALID_TOKEN)
       }

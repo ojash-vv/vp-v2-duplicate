@@ -1,12 +1,11 @@
-const { isEmpty } = require("lodash")
-const bcrypt = require("bcryptjs")
-const MessageTag = require("../../enums/messageNums")
-const db = require("../models/index")
-const HttpStatusCode = require("../../enums/httpErrorCodes")
-const { APIError, BadRequest, NotFound } = require("../../helper/apiErrors")
-const { logger } = require("../../helper/logger")
-
-const Employee = db.employee
+const { isEmpty } = require("lodash");
+const bcrypt = require("bcryptjs");
+const MessageTag = require("../../enums/messageNums");
+const db = require("../models/index");
+const HttpStatusCode = require("../../enums/httpErrorCodes");
+const { APIError, BadRequest, NotFound } = require("../../helper/apiErrors");
+const { logger } = require("../../helper/logger");
+const Employee = db.employee;
 
 const getListOfEmployees = async (req, res) => {
   const { skip = 0, limit = 0 } = req.query

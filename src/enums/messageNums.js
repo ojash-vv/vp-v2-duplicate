@@ -35,6 +35,7 @@ const MessageTag = {
 
   EMAIL_EXISTS: "Email already exists",
   EMPLOYEE_ID_EXISTS: "Employee ID already exists",
+  ATTENDANCE_NOT_FOUND: "Data doesn't exist",
   INVALID_TOKEN: "Invalid token",
 }
 
