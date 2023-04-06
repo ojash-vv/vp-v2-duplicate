@@ -6,9 +6,9 @@ const HttpStatusCode = require("../../enums/httpErrorCodes")
 const { BadRequest, NotFound } = require("../../helper/apiErrors")
 const { logger } = require("../../helper/logger")
 const monthNames = require("../../enums/monthName")
-const MessageTag = require("../../enums/messageNums");
-const Attendance = db.attendanceRecord;
-const Employee = db.employee;
+
+const Attendance = db.attendanceRecord
+const Employee = db.employee
 
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = []
@@ -101,7 +101,7 @@ const allEmployeeAttendance = async (req, res) => {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
         },
       },
-    });
+    })
     const totalCount = await Attendance.findAll({
       where: {
         createdAt: {
@@ -116,20 +116,13 @@ const allEmployeeAttendance = async (req, res) => {
           method: "get all employee attendanceRecord",
         },
         {
-          empId: "employeeId" + empId,
+          empId: `employeeId :${empId} `,
           msg: "employee Attendance Doesn't exist",
-        }
-      );
-      res.status(HttpStatusCode.NOT_FOUND).json({
-        status: false,
-        message: "Not found",
-        error: MessageTag.ATTENDANCE_NOT_FOUND,
-        statusCode: HttpStatusCode.NOT_FOUND,
-      });
-      return;
+        },
+      )
+      throw new NotFound()
     }
-
-    const processedIds = {};
+    const processedIds = {}
     for (let i = 0; i < fetchedRecords.length; i++) {
       const { newEmpId } = fetchedRecords[i]
       if (!processedIds[empId]) {
@@ -175,7 +168,7 @@ const allEmployeeAttendance = async (req, res) => {
         attendanceList: allEmployeeAttendanceRecords,
         totalCount: totalCount?.length,
       },
-    });
+    })
     logger.info(
       {
         controller: "attendanceRecord",

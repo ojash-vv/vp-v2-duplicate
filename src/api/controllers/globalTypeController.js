@@ -1,9 +1,9 @@
-const db = require("../models/index");
 const { isEmpty } = require("lodash");
+const sequelize = require("sequelize");
+const db = require("../models/index");
 const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
 const ObjectHelper = require("../../helper");
-const sequelize = require("sequelize");
 
 const GlobalType = db.globalType
 const GlobalTypeCategory = db.globalTypeCategory
