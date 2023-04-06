@@ -24,7 +24,13 @@ const employeeDsr = async (req, res) => {
 
       for (let j = 0; j < employeeDSRdata?.length; j += 1) {
         if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
-          throw new APIError("Conflict", HttpStatusCode.CONFLICT, false, "DSR already exists!")
+          throw new APIError(
+            "Conflict",
+            HttpStatusCode.CONFLICT,
+            false,
+            "DSR already exists!",
+            MessageTag.DSR_EXIST,
+          )
         }
       }
     }
@@ -368,7 +374,7 @@ const filterEmployeeDsr = async (req, res) => {
       })
     }
 
-    if (isEmpty(isExists)) {
+    if (isEmpty(isExists) || isEmpty(totalFilterData)) {
       throw new NotFound()
     }
     res.status(HttpStatusCode?.OK).json({
