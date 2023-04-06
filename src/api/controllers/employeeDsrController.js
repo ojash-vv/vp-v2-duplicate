@@ -26,7 +26,7 @@ const employeeDsr = async (req, res) => {
       for (let j = 0; j < employeeDSRdata?.length; j++) {
         if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
           throw new APIError(
-            "Conflict",
+            "conflict",
             HttpStatusCode.CONFLICT,
             false,
             MessageTag.DSR_EXIST
