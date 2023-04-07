@@ -24,13 +24,7 @@ const employeeDsr = async (req, res) => {
 
       for (let j = 0; j < employeeDSRdata?.length; j += 1) {
         if (singleDsr?.workingDate === employeeDSRdata[j]?.workingDate) {
-          throw new APIError(
-            "conflict",
-            HttpStatusCode.CONFLICT,
-            false,
-            "DSR already exists!",
-            MessageTag.DSR_EXIST,
-          )
+          throw new APIError("conflict", HttpStatusCode.CONFLICT, false, "DSR already exists!")
         }
       }
     }
@@ -112,11 +106,6 @@ const getEmployeeDsr = async (req, res) => {
         limit: parseInt(limit - skip, 10),
         order: [["workingDate", "DESC"]],
       })
-      //  totalCount = await employee.findAll({
-      //       where: {
-      //         empId,
-      //       },
-      //     })
     } else {
       isExists = await employee.findAll({
         include: [
@@ -129,7 +118,6 @@ const getEmployeeDsr = async (req, res) => {
         limit: parseInt(limit - skip, 10),
         order: [["workingDate", "DESC"]],
       })
-      // totalCount = await employee.findAll({})
     }
 
     if (isEmpty(isExists)) {
@@ -291,15 +279,68 @@ const updateEmployeeDsr = async (req, res) => {
 }
 
 const filterEmployeeDsr = async (req, res) => {
-  const { skip = 0, limit = 0, empId, taskDetail, startDate, endDate } = req.query
+  const { skip = 0, limit = 0, empId, taskDetail, startDate, endDate, userRole } = req.query
   let isExists = []
-  let totalFilterData = []
 
   try {
     if (!empId) {
       throw new BadRequest()
     }
-    if (taskDetail && startDate && endDate) {
+    if (userRole === "user") {
+      if (taskDetail && startDate && endDate) {
+        isExists = await employee.findAll({
+          include: [
+            {
+              model: ProjectsName,
+              attributes: ["projectName"],
+            },
+          ],
+          offset: parseInt(skip, 10),
+          limit: parseInt(limit - skip, 10),
+          where: {
+            empId,
+            taskDetail,
+            workingDate: {
+              [Op.between]: [startDate, endDate],
+            },
+          },
+          order: [["workingDate", "DESC"]],
+        })
+      } else if (taskDetail) {
+        isExists = await employee.findAll({
+          include: [
+            {
+              model: ProjectsName,
+              attributes: ["projectName"],
+            },
+          ],
+          offset: parseInt(skip, 10),
+          limit: parseInt(limit - skip, 10),
+          where: {
+            empId,
+            taskDetail,
+          },
+        })
+      } else if (startDate && endDate) {
+        isExists = await employee.findAll({
+          include: [
+            {
+              model: ProjectsName,
+              attributes: ["projectName"],
+            },
+          ],
+          offset: parseInt(skip, 10),
+          limit: parseInt(limit - skip, 10),
+          where: {
+            empId,
+            workingDate: {
+              [Op.between]: [startDate, endDate],
+            },
+          },
+          order: [["workingDate", "DESC"]],
+        })
+      }
+    } else if (taskDetail && startDate && endDate) {
       isExists = await employee.findAll({
         include: [
           {
@@ -347,40 +388,16 @@ const filterEmployeeDsr = async (req, res) => {
           },
         },
         order: [["workingDate", "DESC"]],
-      })
-    }
-    if (taskDetail && startDate && endDate) {
-      totalFilterData = await employee.findAll({
-        where: {
-          taskDetail,
-          workingDate: {
-            [Op.between]: [startDate, endDate],
-          },
-        },
-      })
-    } else if (taskDetail) {
-      totalFilterData = await employee.findAll({
-        where: {
-          taskDetail,
-        },
-      })
-    } else if (startDate && endDate) {
-      totalFilterData = await employee.findAll({
-        where: {
-          workingDate: {
-            [Op.between]: [startDate, endDate],
-          },
-        },
       })
     }
 
-    if (isEmpty(isExists) || isEmpty(totalFilterData)) {
+    if (isEmpty(isExists)) {
       throw new NotFound()
     }
     res.status(HttpStatusCode?.OK).json({
       status: true,
       message: "success",
-      data: { dsrList: isExists, totalCount: totalFilterData?.length },
+      data: { dsrList: isExists, totalCount: isExists?.length },
     })
     logger.info(
       {

@@ -127,7 +127,7 @@ const allEmployeeAttendance = async (req, res) => {
       const { newEmpId } = fetchedRecords[i]
       if (!processedIds[empId]) {
         processedIds[empId] = true
-        const employeeData = await Employee.findAll({
+        const employeeData = Employee.findAll({
           where: {
             newEmpId,
           },
