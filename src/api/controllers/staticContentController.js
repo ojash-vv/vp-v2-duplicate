@@ -7,7 +7,7 @@ const db = require("../models/index")
 const { staticContent } = db
 
 const updateStaticContent = async (req, res) => {
-  const { empId, title, content } = req?.body
+  const { empId, title, content } = req.body
   try {
     if (!empId || !title || !content) {
       throw new BadRequest()
@@ -81,7 +81,7 @@ const updateStaticContent = async (req, res) => {
 }
 
 const getStaticContent = async (req, res) => {
-  const { empId, title } = req?.query
+  const { empId, title } = req.query
   try {
     if (!empId || !title) {
       throw new BadRequest()
