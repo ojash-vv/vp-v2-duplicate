@@ -3,7 +3,7 @@ const { Op } = require("sequelize")
 const db = require("../models/index")
 const { logger } = require("../../helper/logger")
 
-const employee = db.employeeDsr
+const Employee = db.employeeDsr
 const ProjectsName = db.projectsName
 const HttpStatusCode = require("../../enums/httpErrorCodes")
 const { APIError, BadRequest, NotFound } = require("../../helper/apiErrors")
@@ -13,7 +13,7 @@ const employeeDsr = async (req, res) => {
   const { empId } = req.query
 
   try {
-    const dsrAlreadyExist = await employee.findAll({
+    const dsrAlreadyExist = await Employee.findAll({
       where: {
         empId,
       },
@@ -36,7 +36,8 @@ const employeeDsr = async (req, res) => {
     for (let i = 0; i < employeeDSRdata.length; i += 1) {
       const currentEmployeeDSR = employeeDSRdata[i]
 
-      isCreated = employee.create({
+      // eslint-disable-next-line no-await-in-loop
+      isCreated = await Employee.create({
         empId: empId.toUpperCase(),
         projectId: currentEmployeeDSR?.projectId,
         workingDate: currentEmployeeDSR?.workingDate,
@@ -92,7 +93,7 @@ const getEmployeeDsr = async (req, res) => {
       throw new BadRequest()
     }
     if (userRole === "user") {
-      isExists = await employee.findAll({
+      isExists = await Employee.findAll({
         where: {
           empId,
         },
@@ -107,7 +108,7 @@ const getEmployeeDsr = async (req, res) => {
         order: [["workingDate", "DESC"]],
       })
     } else {
-      isExists = await employee.findAll({
+      isExists = await Employee.findAll({
         include: [
           {
             model: ProjectsName,
@@ -162,7 +163,7 @@ const getSingleEmployeeDsr = async (req, res) => {
     if (!id || !empId) {
       throw new BadRequest()
     }
-    const isEmployeeExists = await employee.findOne({
+    const isEmployeeExists = await Employee.findOne({
       where: {
         id,
       },
@@ -216,7 +217,7 @@ const updateEmployeeDsr = async (req, res) => {
     ) {
       throw new BadRequest()
     }
-    const getUpdateEmployee = await employee.findOne({
+    const getUpdateEmployee = await Employee.findOne({
       where: {
         id,
       },
@@ -224,7 +225,7 @@ const updateEmployeeDsr = async (req, res) => {
     if (isEmpty(getUpdateEmployee)) {
       throw new NotFound()
     }
-    const isUpdated = await employee.update(
+    const isUpdated = await Employee.update(
       {
         empId,
         projectId,
@@ -288,7 +289,7 @@ const filterEmployeeDsr = async (req, res) => {
     }
     if (userRole === "user") {
       if (taskDetail && startDate && endDate) {
-        isExists = await employee.findAll({
+        isExists = await Employee.findAll({
           include: [
             {
               model: ProjectsName,
@@ -307,7 +308,7 @@ const filterEmployeeDsr = async (req, res) => {
           order: [["workingDate", "DESC"]],
         })
       } else if (taskDetail) {
-        isExists = await employee.findAll({
+        isExists = await Employee.findAll({
           include: [
             {
               model: ProjectsName,
@@ -322,7 +323,7 @@ const filterEmployeeDsr = async (req, res) => {
           },
         })
       } else if (startDate && endDate) {
-        isExists = await employee.findAll({
+        isExists = await Employee.findAll({
           include: [
             {
               model: ProjectsName,
@@ -341,7 +342,7 @@ const filterEmployeeDsr = async (req, res) => {
         })
       }
     } else if (taskDetail && startDate && endDate) {
-      isExists = await employee.findAll({
+      isExists = await Employee.findAll({
         include: [
           {
             model: ProjectsName,
@@ -359,7 +360,7 @@ const filterEmployeeDsr = async (req, res) => {
         order: [["workingDate", "DESC"]],
       })
     } else if (taskDetail) {
-      isExists = await employee.findAll({
+      isExists = await Employee.findAll({
         include: [
           {
             model: ProjectsName,
@@ -373,7 +374,7 @@ const filterEmployeeDsr = async (req, res) => {
         },
       })
     } else if (startDate && endDate) {
-      isExists = await employee.findAll({
+      isExists = await Employee.findAll({
         include: [
           {
             model: ProjectsName,
