@@ -50,7 +50,8 @@ const getAttendanceRecord = async (req, res) => {
       const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length
       const employeePresentDays = newAttendance.length
       if (weekdaysInMonth || employeePresentDays) {
-        employeeName.data.push(month, {
+        employeeName.data.push({
+          monthName: month,
           presentDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         })
@@ -61,6 +62,7 @@ const getAttendanceRecord = async (req, res) => {
       status: true,
       message: "success",
       data: employeeName,
+      statusCode: HttpStatusCode?.OK,
     })
     logger.info(
       {
@@ -83,7 +85,14 @@ const getAttendanceRecord = async (req, res) => {
         msg: `catch error: ${error?.msg}`,
       },
     )
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message })
+    // res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message })
+    if (error?.httpCode) {
+      res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+        status: error?.isOperational || false,
+        message: error?.message,
+        statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+      })
+    }
   }
 }
 const allEmployeeAttendance = async (req, res) => {
