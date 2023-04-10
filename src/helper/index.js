@@ -40,7 +40,7 @@ function camelize(str) {
 }
 
 function localToUTC(date) {
-  return new moment(date, "YYYY-MM-DDTHH:mm").utc();
+  return new moment(date, "YYYY-MM-DD").utc();
 }
 function formatDate(date) {
   return new moment(date).format("YYYY-MM-DD");
@@ -52,7 +52,9 @@ function getDates(startDate, endDate) {
   const dates = [];
 
   while (date <= endDate) {
-    dates.push(new Date(date));
+    let dateNew=new Date(date).toDateString();
+    const formatDate=this.formatDate(dateNew)
+    dates.push(formatDate);
     date.setDate(date.getDate() + 1);
   }
 

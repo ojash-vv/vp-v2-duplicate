@@ -10,15 +10,15 @@ const Employee = db.employee;
 const Events = db.events;
 
 const addEvent = async (req, res) => {
-  const { leaveDate, eventName, eventDesc } = req?.body;
+  const {startEventDate,endEventDate, eventName, eventDesc } = req?.body;
 
-  const startDate = new Date(leaveDate[0]);
-  const enadDate = new Date(leaveDate[1]);
+  const startDateUtc = ObjectHelper.formatDate(startEventDate);
+  const enadDateUtc = ObjectHelper.formatDate(endEventDate);
+  const startDate = new Date(startDateUtc)
+  const enadDate = new Date(enadDateUtc);
 
-  const startDateUtc = new Date(startDate.setDate(startDate.getDate() + 1));
-  const enadDateUtc = new Date(enadDate.setDate(enadDate.getDate() + 1));
 
-  const leaveDays = ObjectHelper.getDates(startDateUtc, enadDateUtc);
+  const leaveDays = ObjectHelper.getDates(startDate, enadDate);
 
   logger.warn(
     {
@@ -64,8 +64,8 @@ const addEvent = async (req, res) => {
     }
     const result = await Events.create({
       eventName,
-      eventStartDate: startDateUtc,
-      eventEndDate: enadDateUtc,
+      eventStartDate: startDate,
+      eventEndDate: enadDate,
       eventCategory: "event",
       eventDesc,
       createdBy: "1",
@@ -121,15 +121,14 @@ const addEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
   const { id } = req?.params;
-  const { leaveDate, eventName, eventDesc } = req?.body;
+  const { startEventDate,endEventDate, eventName, eventDesc } = req?.body;
 
-  const startDate = new Date(leaveDate[0]);
-  const enadDate = new Date(leaveDate[1]);
+  const startDateUtc = ObjectHelper.formatDate(startEventDate);
+  const enadDateUtc = ObjectHelper.formatDate(endEventDate);
+  const startDate = new Date(startDateUtc)
+  const enadDate = new Date(enadDateUtc);
 
-  const startDateUtc = new Date(startDate.setDate(startDate.getDate() + 1));
-  const enadDateUtc = new Date(enadDate.setDate(enadDate.getDate() + 1));
-
-  const leaveDays = ObjectHelper.getDates(startDateUtc, enadDateUtc);
+  const leaveDays = ObjectHelper.getDates(startDate, enadDate);
 
   logger.warn(
     {
@@ -176,8 +175,8 @@ const updateEvent = async (req, res) => {
     const result = await Events.update(
       {
         eventName,
-        eventStartDate: startDateUtc,
-        eventEndDate: enadDateUtc,
+        eventStartDate: startDate,
+        eventEndDate: enadDate,
         eventCategory: "event",
         eventDesc,
         createdBy: "1",

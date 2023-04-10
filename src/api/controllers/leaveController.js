@@ -10,13 +10,12 @@ const Employee = db.employee;
 const EmployeeLeave = db.employeeLeave;
 
 const markLeave = async (req, res) => {
-  const { leaveDate, empId = null, leaveType, leaveReason = null,userRole=null ,employeeId=null } = req?.body;
-  const startDate = new Date(leaveDate[0]);
-  const enadDate = new Date(leaveDate[1]);
-  const startDateUtc = new Date(startDate.setDate(startDate.getDate() + 1));
-  const enadDateUtc = new Date(enadDate.setDate(enadDate.getDate() + 1));
-
-  const leaveDays = ObjectHelper.getDates(startDateUtc, enadDateUtc);
+  const { startLeaveDate,endLeaveDate,leaveDate, empId = null, leaveType, leaveReason = null,userRole=null ,employeeId=null } = req?.body;
+  const startDateUtc = ObjectHelper.formatDate(startLeaveDate);
+  const enadDateUtc = ObjectHelper.formatDate(endLeaveDate);
+  const startDate = new Date(startDateUtc)
+  const enadDate = new Date(enadDateUtc);
+  const leaveDays = ObjectHelper.getDates(startDate, enadDate);
   let leaveStatus;
   logger.warn(
     {
@@ -27,7 +26,7 @@ const markLeave = async (req, res) => {
   );
 
   try {
-    if (!startDateUtc || !enadDateUtc || !leaveType || !empId) {
+    if (!startDate || !enadDate || !leaveType || !empId) {
       throw new Error(MessageTag.ALL_REQ);
     }
     leaveDays.forEach(async function (date) {
@@ -51,7 +50,7 @@ const markLeave = async (req, res) => {
         where: sequelize.where(
           sequelize.fn("date", sequelize.col("leaveFrom")),
           "=",
-          sequelize.fn("date", startDateUtc)
+          sequelize.fn("date", startDate)
         ),
         $and: sequelize.where(sequelize.col("empId"), "=", empId),
       },
@@ -75,18 +74,19 @@ const markLeave = async (req, res) => {
       });
       return;
     }
-    if(userRole=='admin')
+
+    if(userRole==='admin')
     {    
-      leaveStatus==1
+      leaveStatus=1
   }
   else{
-    leaveStatus==0
+    leaveStatus=0
   }
     const result = await EmployeeLeave.create({
       empId,
       leaveType,
-      leaveFrom: startDateUtc,
-      leaveTo: enadDateUtc,
+      leaveFrom: startDate,
+      leaveTo: enadDate,
       leaveDays: leaveDays,
       leaveReason,
       leaveStatus: leaveStatus,
@@ -143,15 +143,13 @@ const markLeave = async (req, res) => {
 
 const updateLeave = async (req, res) => {
   const { id } = req?.params;
-  const { leaveDate, empId = null, leaveType, leaveReason = null, employeeId = null  } = req?.body;
+  const {startLeaveDate,endLeaveDate, leaveDate, empId = null, leaveType, leaveReason = null, employeeId = null  } = req?.body;
 
-  const startDate = new Date(leaveDate[0]);
-  const enadDate = new Date(leaveDate[1]);
-
-  const startDateUtc = new Date(startDate.setDate(startDate.getDate() + 1));
-  const enadDateUtc = new Date(enadDate.setDate(enadDate.getDate() + 1));
-
-  const leaveDays = ObjectHelper.getDates(startDateUtc, enadDateUtc);
+  const startDateUtc = ObjectHelper.formatDate(startLeaveDate);
+  const enadDateUtc = ObjectHelper.formatDate(endLeaveDate);
+  const startDate = new Date(startDateUtc)
+  const enadDate = new Date(enadDateUtc);
+  const leaveDays = ObjectHelper.getDates(startDate, enadDate);
 
   logger.warn(
     {
@@ -213,8 +211,8 @@ const updateLeave = async (req, res) => {
       {
         empId,
         leaveType,
-        leaveFrom: startDateUtc,
-        leaveTo: enadDateUtc,
+        leaveFrom: startDate,
+        leaveTo: enadDate,
         leaveDays: leaveDays,
         leaveReason,
         leaveStatus: '1',
@@ -273,6 +271,8 @@ const updateLeave = async (req, res) => {
 };
 
 const getEmployeeLeave = async (req, res) => {
+  const { userRole,employeeId } = req?.query;
+  let leaveResult=[];
   logger.warn(
     {
       component: "leaveController --->",
@@ -287,13 +287,33 @@ const getEmployeeLeave = async (req, res) => {
         where: sequelize.where(sequelize.col("leaveStatus"), "=", "1"),
       },
     });
+    if(userRole==='admin')
+    {
+      const [leaveResult, metadata] = await db.sequelize.query(
+        "SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveDays,emp_apply_leave.leaveReason,emp_apply_leave.leaveStatus,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId"
+      );
+      res.status(200).send({
+        status: true,
+        data: leaveResult,
+      });
+    }
+    else
+    {
     const [results, metadata] = await db.sequelize.query(
-      "SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveDays,emp_apply_leave.leaveReason,emp_apply_leave.leaveStatus,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId"
+      `SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveDays,emp_apply_leave.leaveReason,emp_apply_leave.leaveStatus,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId`
     );
+    results.forEach(async function (item) {
+    if((item.leaveStatus==1 && item.empId!=employeeId) || (item.leaveStatus==0 && item.empId==employeeId) || (item.leaveStatus==1 && item.empId==employeeId))
+    {
+    leaveResult.push(item)
+    }
+    })
     res.status(200).send({
       status: true,
-      data: results,
+      data: leaveResult,
     });
+    }
+   
     logger.info(
       {
         component: "leaveController --->",
