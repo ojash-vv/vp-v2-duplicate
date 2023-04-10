@@ -43,12 +43,12 @@ router.get("/getSingle-EmployeeDsr", isUserAuthenticated, getSingleEmployeeDsr)
 router.patch("/update-EmployeeDsr", isUserAuthenticated, updateEmployeeDsr)
 router.get("/filter-EmployeeDsr", isUserAuthenticated, filterEmployeeDsr)
 
-/*----------------attendanceRecord----------------*/
+/* ----------------attendanceRecord----------------*/
 
 router.get("/attendance-record", isUserAuthenticated, getAttendanceRecord)
 router.get("/allAttendance-record", isUserAuthenticated, allEmployeeAttendance)
 
-/*******************Employee Leave********************/
+/** *****************Employee Leave******************* */
 router.post("/markLeave", isUserAuthenticated, markLeave);
 router.put("/updateLeave/:id", isUserAuthenticated, updateLeave);
 

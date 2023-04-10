@@ -1,13 +1,13 @@
-const db = require("../models/index");
-const { isEmpty } = require("lodash");
-const { logger } = require("../../helper/logger");
-const MessageTag = require("../../enums/messageNums");
-const ObjectHelper = require("../../helper");
-const sequelize = require("sequelize");
-const HttpStatusCode = require("../../enums/httpErrorCodes");
+const { isEmpty } = require("lodash")
+const sequelize = require("sequelize")
+const db = require("../models/index")
+const { logger } = require("../../helper/logger")
+const MessageTag = require("../../enums/messageNums")
+const ObjectHelper = require("../../helper")
+const HttpStatusCode = require("../../enums/httpErrorCodes")
+const { BadRequest } = require("../../helper/apiErrors")
 
-const Employee = db.employee;
-const EmployeeLeave = db.employeeLeave;
+const EmployeeLeave = db.employeeLeave
 
 const markLeave = async (req, res) => {
   const { startLeaveDate,endLeaveDate,leaveDate, empId = null, leaveType, leaveReason = null,userRole=null ,employeeId=null } = req?.body;
@@ -22,29 +22,26 @@ const markLeave = async (req, res) => {
       component: "leaveController --->",
       method: "markLeave --->",
     },
-    { payload: req?.body, msg: "Mark Leave started....." }
-  );
+    { payload: req?.body, msg: "Mark Leave started....." },
+  )
 
   try {
     if (!startDate || !enadDate || !leaveType || !empId) {
       throw new Error(MessageTag.ALL_REQ);
     }
-    leaveDays.forEach(async function (date) {
-      const LeaveDate = ObjectHelper.formatDate(date);
+    leaveDays.forEach(async (date) => {
+      const LeaveDate = ObjectHelper.formatDate(date)
 
       const isExists = await EmployeeLeave.findOne({
         where: {
-          where: sequelize.where(
-            sequelize.col("leaveDays"),
-            "like",
-            `%${LeaveDate}%`
-          ),
+          where: sequelize.where(sequelize.col("leaveDays"), "like", `%${LeaveDate}%`),
           $and: sequelize.where(sequelize.col("empId"), "=", empId),
         },
-      });
+      })
       if (!isEmpty(isExists)) {
+        throw new BadRequest()
       }
-    });
+    })
     const isExists = await EmployeeLeave.findOne({
       where: {
         where: sequelize.where(
@@ -54,7 +51,7 @@ const markLeave = async (req, res) => {
         ),
         $and: sequelize.where(sequelize.col("empId"), "=", empId),
       },
-    });
+    })
 
     if (!isEmpty(isExists)) {
       logger.error(
@@ -65,14 +62,14 @@ const markLeave = async (req, res) => {
         {
           payload: req?.body,
           msg: "Leave already marked.....",
-        }
-      );
+        },
+      )
       res.status(HttpStatusCode.BAD_REQUEST).json({
         status: false,
         message: MessageTag.LEAVE_EXIST,
         statusCode: HttpStatusCode.BAD_REQUEST,
-      });
-      return;
+      })
+      return
     }
 
     if(userRole==='admin')
@@ -94,15 +91,15 @@ const markLeave = async (req, res) => {
       updatedBy: employeeId,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
-    data = ObjectHelper.formatKeys(result.dataValues);
+    })
+    const data = ObjectHelper.formatKeys(result.dataValues)
     if (!isEmpty(result)) {
       res.status(200).send({
         status: true,
         message: MessageTag.LEAVE_MARK,
-        data: data,
+        data,
         statusCode: HttpStatusCode.OK,
-      });
+      })
       logger.info(
         {
           component: "leaveController --->",
@@ -110,9 +107,9 @@ const markLeave = async (req, res) => {
         },
         {
           data: isExists,
-          msg: "Leave Marked for: " + empId,
-        }
-      );
+          msg: `Leave Marked for: ${empId}`,
+        },
+      )
     }
   } catch (error) {
     logger.error(
@@ -122,24 +119,23 @@ const markLeave = async (req, res) => {
       },
       {
         payload: req?.body,
-        msg: "Catch error: " + error?.message,
-      }
-    );
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
     if (error?.httpCode) {
       res.status(error?.httpCode).json({
         status: error?.isOperational,
         message: error?.message,
         statusCode: error?.httpCode,
-      });
+      })
     }
     res.status(HttpStatusCode.INTERNAL_SERVER).json({
       status: false,
       message: error?.message,
       statusCode: HttpStatusCode.INTERNAL_SERVER,
-    });
+    })
   }
-  return;
-};
+}
 
 const updateLeave = async (req, res) => {
   const { id } = req?.params;
@@ -156,39 +152,36 @@ const updateLeave = async (req, res) => {
       component: "leaveController --->",
       method: "updateLeave --->",
     },
-    { payload: req?.body, msg: "Update Leave started....." }
-  );
+    { payload: req?.body, msg: "Update Leave started....." },
+  )
 
   try {
     if (!startDateUtc || !enadDateUtc || !leaveType || !empId) {
-      throw new Error(MessageTag.ALL_REQ);
+      throw new Error(MessageTag.ALL_REQ)
     }
-    leaveDays.forEach(async function (date) {
-      const LeaveDate = ObjectHelper.formatDate(date);
+    leaveDays.forEach(async (date) => {
+      const LeaveDate = ObjectHelper.formatDate(date)
       const isExists = await EmployeeLeave.findOne({
         where: {
-          where: sequelize.where(
-            sequelize.col("leaveDays"),
-            "like",
-            `%${LeaveDate}%`
-          ),
+          where: sequelize.where(sequelize.col("leaveDays"), "like", `%${LeaveDate}%`),
           $and: sequelize.where(sequelize.col("empId"), "=", empId),
         },
-      });
+      })
       if (!isEmpty(isExists)) {
+        throw new BadRequest()
       }
-    });
+    })
     const isExists = await EmployeeLeave.findOne({
       where: {
         where: sequelize.where(
           sequelize.fn("date", sequelize.col("leaveFrom")),
           "=",
-          sequelize.fn("date", startDateUtc)
+          sequelize.fn("date", startDateUtc),
         ),
         $and: sequelize.where(sequelize.col("empId"), "=", empId),
       },
-    });
-    if (!isEmpty(isExists) && isExists?.id != id) {
+    })
+    if (!isEmpty(isExists) && isExists?.id !== id) {
       logger.error(
         {
           component: "leaveController --->",
@@ -197,14 +190,14 @@ const updateLeave = async (req, res) => {
         {
           payload: req?.body,
           msg: "Leave already marked.....",
-        }
-      );
+        },
+      )
       res.status(HttpStatusCode.BAD_REQUEST).json({
         status: false,
         message: MessageTag.LEAVE_EXIST,
         statusCode: HttpStatusCode.BAD_REQUEST,
-      });
-      return;
+      })
+      return
     }
 
     const result = await EmployeeLeave.update(
@@ -221,16 +214,16 @@ const updateLeave = async (req, res) => {
       },
       {
         where: {
-          id: id,
+          id,
         },
-      }
-    );
+      },
+    )
     if (!isEmpty(result)) {
       res.status(200).send({
         status: true,
         message: MessageTag.LEAVE_UPDATED,
         statusCode: HttpStatusCode.OK,
-      });
+      })
 
       logger.info(
         {
@@ -239,9 +232,9 @@ const updateLeave = async (req, res) => {
         },
         {
           data: isExists,
-          msg: "Leave Marked for: " + empId,
-        }
-      );
+          msg: `Leave Marked for: ${empId}`,
+        },
+      )
     }
   } catch (error) {
     logger.error(
@@ -251,24 +244,23 @@ const updateLeave = async (req, res) => {
       },
       {
         payload: req?.body,
-        msg: "Catch error: " + error?.message,
-      }
-    );
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
     if (error?.httpCode) {
       res.status(error?.httpCode).json({
         status: error?.isOperational,
         message: error?.message,
         statusCode: error?.httpCode,
-      });
+      })
     }
     res.status(HttpStatusCode.INTERNAL_SERVER).json({
       status: false,
       message: error?.message,
       statusCode: HttpStatusCode.INTERNAL_SERVER,
-    });
+    })
   }
-  return;
-};
+}
 
 const getEmployeeLeave = async (req, res) => {
   const { userRole,employeeId } = req?.query;
@@ -278,8 +270,8 @@ const getEmployeeLeave = async (req, res) => {
       component: "leaveController --->",
       method: "getEmployeeLeave --->",
     },
-    { payload: null, msg: "Get Employee Leave started....." }
-  );
+    { payload: null, msg: "Get Employee Leave started....." },
+  )
 
   try {
     const result = await EmployeeLeave.findAll({
@@ -322,8 +314,8 @@ const getEmployeeLeave = async (req, res) => {
       {
         payload: null,
         msg: "Employee Leave List: ",
-      }
-    );
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -332,12 +324,12 @@ const getEmployeeLeave = async (req, res) => {
       },
       {
         payload: null,
-        msg: "Catch error: " + error?.message,
-      }
-    );
-    res.status(400).json({ status: false, error: error?.message });
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
+    res.status(400).json({ status: false, error: error?.message })
   }
-};
+}
 
 const getEmployeeDayLeave = async (req, res) => {
   logger.warn(
@@ -345,24 +337,24 @@ const getEmployeeDayLeave = async (req, res) => {
       component: "leaveController --->",
       method: "getEmployeeDayLeave --->",
     },
-    { payload: null, msg: "Get Employee Day Leave started....." }
-  );
-  const nowDate = new Date();
-  const todayDate = ObjectHelper.formatDate(nowDate);
+    { payload: null, msg: "Get Employee Day Leave started....." },
+  )
+  const nowDate = new Date()
+  const todayDate = ObjectHelper.formatDate(nowDate)
 
   try {
-    const [results, metadata] = await db.sequelize.query(
-      `SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveReason,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId where leaveDays like '%${todayDate}%' and leaveStatus=1 and leaveType!='work_from_home'`
-    );
+    const [results] = await db.sequelize.query(
+      `SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveReason,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId where leaveDays like '%${todayDate}%' and leaveStatus=1 and leaveType!='work_from_home'`,
+    )
 
-    const [results_WFH, metadata_WFH] = await db.sequelize.query(
-      `SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveReason,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId where leaveDays like '%${todayDate}%' and leaveStatus=1 and leaveType='work_from_home'`
-    );
+    const [resultsWFH] = await db.sequelize.query(
+      `SELECT emp_apply_leave.id,emp_apply_leave.empId,emp_apply_leave.leaveFrom,emp_apply_leave.leaveTo,emp_apply_leave.leaveType,emp_apply_leave.leaveReason,vp_users.userName FROM emp_apply_leave JOIN vp_users ON emp_apply_leave.empId = vp_users.empId where leaveDays like '%${todayDate}%' and leaveStatus=1 and leaveType='work_from_home'`,
+    )
     res.status(200).send({
       status: true,
       data: results,
-      dataWFH: results_WFH,
-    });
+      dataWFH: resultsWFH,
+    })
     logger.info(
       {
         component: "leaveController --->",
@@ -371,8 +363,8 @@ const getEmployeeDayLeave = async (req, res) => {
       {
         payload: null,
         msg: "Employees Day Leave List: ",
-      }
-    );
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -381,15 +373,15 @@ const getEmployeeDayLeave = async (req, res) => {
       },
       {
         payload: null,
-        msg: "Catch error: " + error?.message,
-      }
-    );
-    res.status(400).json({ status: false, error: error?.message });
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
+    res.status(400).json({ status: false, error: error?.message })
   }
-};
+}
 module.exports = {
   markLeave,
   updateLeave,
   getEmployeeLeave,
   getEmployeeDayLeave,
-};
+}
