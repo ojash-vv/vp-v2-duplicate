@@ -1,29 +1,35 @@
-const db = require("../models/index");
 const { isEmpty } = require("lodash");
+const sequelize = require("sequelize");
+const db = require("../models/index");
 const { logger } = require("../../helper/logger");
 const MessageTag = require("../../enums/messageNums");
 const ObjectHelper = require("../../helper");
 
-const GlobalType = db.globalType;
-const GlobalTypeCategory = db.globalTypeCategory;
+const GlobalType = db.globalType
+const GlobalTypeCategory = db.globalTypeCategory
 
 const masterGlobalType = async (req, res) => {
-  const { category } = req?.params;
+  const { category } = req.params
 
   logger.warn(
     {
       component: "globalType --->",
       method: "masterGlobalType --->",
     },
-    { payload: category, msg: "Get master global type started....." }
-  );
+    { payload: category, msg: "Get master global type started....." },
+  )
 
   try {
     const result = await GlobalType.findAll({
       where: {
-        GlobalTypeCategory_uniqeValue: category,
+        where: sequelize.where(
+          sequelize.col("GlobalTypeCategory_uniqeValue"),
+          "=",
+          category
+        ),
+        $and: sequelize.where(sequelize.col("isActive"), "=", "1"),
       },
-    });
+    })
     if (isEmpty(result)) {
       logger.error(
         {
@@ -32,17 +38,17 @@ const masterGlobalType = async (req, res) => {
         },
         {
           payload: category,
-          msg: "Global type categoey not exists.....",
-        }
-      );
-      res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
-      return;
+          msg: "Global type category not exists.....",
+        },
+      )
+      res.status(400).json({ status: false, error: MessageTag.GTC_NOT })
+      return
     }
 
     res.status(200).send({
       status: true,
       data: result,
-    });
+    })
     logger.info(
       {
         component: "globalType --->",
@@ -51,8 +57,8 @@ const masterGlobalType = async (req, res) => {
       {
         payload: category,
         msg: "Master global type list: ",
-      }
-    );
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -61,34 +67,33 @@ const masterGlobalType = async (req, res) => {
       },
       {
         payload: category,
-        msg: "Catch error: " + error?.message,
-      }
-    );
-    res.status(400).json({ status: false, error: error?.message });
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
+    res.status(400).json({ status: false, error: error?.message })
   }
-};
+}
 
 const addGlobalType = async (req, res) => {
-  const globalTypeParam = req?.body;
+  const globalTypeParam = req?.body
   if (!isEmpty(globalTypeParam)) {
-    const displayName = globalTypeParam?.name;
-    const globalTypeCategory = globalTypeParam?.globalTypeCategory;
+    const displayName = globalTypeParam?.name
+    const globalTypeCategory = globalTypeParam?.globalTypeCategory
     logger.warn(
       {
         component: "globalType --->",
         method: "addGlobalType --->",
       },
-      { payload: displayName, msg: "Add global type started....." }
-    );
-    const uniqueValue = globalTypeParam?.name?.replace(/ /g, "_").toLowerCase();
+      { payload: displayName, msg: "Add global type started....." },
+    )
+    const uniqueValue = globalTypeParam?.name?.replace(/ /g, "_").toLowerCase()
     try {
-      if (!displayName || !globalTypeCategory)
-        throw new Error(MessageTag.ALL_REQ);
+      if (!displayName || !globalTypeCategory) throw new Error(MessageTag.ALL_REQ)
       const isCategoryExists = await GlobalTypeCategory.findOne({
         where: {
           uniqueValue: globalTypeCategory,
         },
-      });
+      })
       if (isEmpty(isCategoryExists)) {
         logger.error(
           {
@@ -98,17 +103,17 @@ const addGlobalType = async (req, res) => {
           {
             payload: displayName,
             msg: "Global type Category not exists.....",
-          }
-        );
-        res.status(400).json({ status: false, error: MessageTag.GTC_NOT });
-        return;
+          },
+        )
+        res.status(400).json({ status: false, error: MessageTag.GTC_NOT })
+        return
       }
       const isExists = await GlobalType.findOne({
         where: {
-          uniqueValue: uniqueValue,
+          uniqueValue,
           globalTypeCategory_uniqeValue: globalTypeCategory,
         },
-      });
+      })
       if (!isEmpty(isExists)) {
         logger.error(
           {
@@ -118,12 +123,10 @@ const addGlobalType = async (req, res) => {
           {
             payload: displayName,
             msg: "Global type already exists.....",
-          }
-        );
-        res
-          .status(400)
-          .json({ status: false, error: MessageTag.GLOBALTYPE_EXIST });
-        return;
+          },
+        )
+        res.status(400).json({ status: false, error: MessageTag.GLOBALTYPE_EXIST })
+        return
       }
       const result = await GlobalType.create({
         displayName,
@@ -133,13 +136,13 @@ const addGlobalType = async (req, res) => {
         updatedBy: "1",
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
-      data = ObjectHelper.formatKeys(result.dataValues);
+      })
+      const data = ObjectHelper.formatKeys(result.dataValues)
       res.status(200).send({
         status: true,
         message: MessageTag.GLOBALTYPE_ADD,
-        data: data,
-      });
+        data,
+      })
       logger.info(
         {
           component: "globalType --->",
@@ -147,9 +150,9 @@ const addGlobalType = async (req, res) => {
         },
         {
           data: isExists,
-          msg: "Global type added: " + displayName,
-        }
-      );
+          msg: `Global type added: ${displayName}`,
+        },
+      )
     } catch (error) {
       logger.error(
         {
@@ -158,39 +161,38 @@ const addGlobalType = async (req, res) => {
         },
         {
           payload: displayName,
-          msg: "Catch error: " + error?.message,
-        }
-      );
-      res.status(400).json({ status: false, error: error?.message });
+          msg: `Catch error: ${error?.message}`,
+        },
+      )
+      res.status(400).json({ status: false, error: error?.message })
     }
   }
-};
+}
 
 const updateGlobalType = async (req, res) => {
-  const { id } = req?.params;
-  const globalTypeParam = req?.body;
+  const { id } = req.params
+  const globalTypeParam = req?.body
   if (!isEmpty(globalTypeParam)) {
-    const displayName = globalTypeParam?.name;
-    const uniqueValue = globalTypeParam?.name?.replace(/ /g, "_").toLowerCase();
-    const globalTypeCategory = globalTypeParam?.globalTypeCategory;
+    const displayName = globalTypeParam?.name
+    const uniqueValue = globalTypeParam?.name?.replace(/ /g, "_").toLowerCase()
+    const globalTypeCategory = globalTypeParam?.globalTypeCategory
 
     logger.warn(
       {
         component: "globalType --->",
         method: "updateGlobalType --->",
       },
-      { payload: displayName, msg: "Update global type started....." }
-    );
+      { payload: displayName, msg: "Update global type started....." },
+    )
 
     try {
-      if (!displayName || !globalTypeCategory)
-        throw new Error(MessageTag.ALL_REQ);
+      if (!displayName || !globalTypeCategory) throw new Error(MessageTag.ALL_REQ)
 
       const isCategoryExists = await GlobalTypeCategory.findOne({
         where: {
           uniqueValue: globalTypeCategory,
         },
-      });
+      })
       if (isEmpty(isCategoryExists)) {
         logger.error(
           {
@@ -200,18 +202,18 @@ const updateGlobalType = async (req, res) => {
           {
             payload: displayName,
             msg: "Global type Category not exists.....",
-          }
-        );
-        res.status(419).json({ status: false, error: MessageTag.GTC_NOT });
-        return;
+          },
+        )
+        res.status(419).json({ status: false, error: MessageTag.GTC_NOT })
+        return
       }
 
       const isExists = await GlobalType.findOne({
         where: {
-          uniqueValue: uniqueValue,
+          uniqueValue,
           globalTypeCategory_uniqeValue: globalTypeCategory,
         },
-      });
+      })
       if (!isEmpty(isExists)) {
         logger.error(
           {
@@ -221,15 +223,13 @@ const updateGlobalType = async (req, res) => {
           {
             payload: displayName,
             msg: "Global type already exists.....",
-          }
-        );
-        res
-          .status(400)
-          .json({ status: false, error: MessageTag.GLOBALTYPE_EXIST });
-        return;
+          },
+        )
+        res.status(400).json({ status: false, error: MessageTag.GLOBALTYPE_EXIST })
+        return
       }
 
-      const result = await GlobalType.update(
+      await GlobalType.update(
         {
           displayName,
           uniqueValue,
@@ -239,14 +239,14 @@ const updateGlobalType = async (req, res) => {
         },
         {
           where: {
-            id: id,
+            id,
           },
-        }
-      );
+        },
+      )
       res.status(200).send({
         status: true,
         message: MessageTag.GLOBALTYPE_UPDATE,
-      });
+      })
       logger.info(
         {
           component: "globalType --->",
@@ -254,9 +254,9 @@ const updateGlobalType = async (req, res) => {
         },
         {
           data: isExists,
-          msg: "Global type updated,Id: " + id,
-        }
-      );
+          msg: `Global type updated,Id: ${id}`,
+        },
+      )
     } catch (error) {
       logger.error(
         {
@@ -265,28 +265,28 @@ const updateGlobalType = async (req, res) => {
         },
         {
           payload: displayName,
-          msg: "Catch error: " + error?.message,
-        }
-      );
-      res.status(400).json({ status: false, error: error?.message });
+          msg: `Catch error: ${error?.message}`,
+        },
+      )
+      res.status(400).json({ status: false, error: error?.message })
     }
   }
-};
+}
 
 const deleteGlobalType = async (req, res) => {
-  const { id } = req?.params;
+  const { id } = req.params
   logger.warn(
     {
       component: "globalType --->",
       method: "deleteGlobalType--->",
     },
-    { payload: id, msg: "Delete global type started....." }
-  );
+    { payload: id, msg: "Delete global type started....." },
+  )
 
   try {
     const isExists = await GlobalType.findOne({
-      where: { id: id },
-    });
+      where: { id },
+    })
     if (isEmpty(isExists)) {
       logger.error(
         {
@@ -296,23 +296,21 @@ const deleteGlobalType = async (req, res) => {
         {
           payload: id,
           msg: "Global type not exists.....",
-        }
-      );
-      res
-        .status(400)
-        .json({ status: false, error: MessageTag.GLOBALTYPE_NOT_EXIST });
-      return;
+        },
+      )
+      res.status(400).json({ status: false, error: MessageTag.GLOBALTYPE_NOT_EXIST })
+      return
     }
 
-    const result = await GlobalType.destroy({
+    await GlobalType.destroy({
       where: {
-        id: id,
+        id,
       },
-    });
+    })
     res.status(200).send({
       status: true,
       message: MessageTag.GLOBALTYPE_DELETE,
-    });
+    })
     logger.info(
       {
         component: "globalType --->",
@@ -320,9 +318,9 @@ const deleteGlobalType = async (req, res) => {
       },
       {
         data: isExists,
-        msg: "Global type deleted,Id: " + id,
-      }
-    );
+        msg: `Global type deleted,Id: ${id}`,
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -331,12 +329,12 @@ const deleteGlobalType = async (req, res) => {
       },
       {
         payload: id,
-        msg: "Catch error: " + error?.message,
-      }
-    );
-    res.status(400).json({ status: false, error: error?.message });
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
+    res.status(400).json({ status: false, error: error?.message })
   }
-};
+}
 
 const getGlobalType = async (req, res) => {
   logger.warn(
@@ -344,15 +342,15 @@ const getGlobalType = async (req, res) => {
       component: "globalType --->",
       method: "getGlobalType --->",
     },
-    { payload: null, msg: "Get global type started....." }
-  );
+    { payload: null, msg: "Get global type started....." },
+  )
 
   try {
-    const result = await GlobalType.findAll();
+    const result = await GlobalType.findAll()
     res.status(200).send({
       status: true,
       data: result,
-    });
+    })
     logger.info(
       {
         component: "globalType --->",
@@ -361,8 +359,8 @@ const getGlobalType = async (req, res) => {
       {
         payload: null,
         msg: "Global type List: ",
-      }
-    );
+      },
+    )
   } catch (error) {
     logger.error(
       {
@@ -371,21 +369,22 @@ const getGlobalType = async (req, res) => {
       },
       {
         payload: null,
-        msg: "Catch error: " + error?.message,
-      }
-    );
-    res.status(400).json({ status: false, error: error?.message });
+        msg: `Catch error: ${error?.message}`,
+      },
+    )
+    res.status(400).json({ status: false, error: error?.message })
   }
-};
+}
 
 const updateStatusGlobalType = async (req, res) => {
-  const { id } = req?.params;
-  const globalTypeParam = req?.body;
+  const { id } = req.params
+  let isActive
+  const globalTypeParam = req?.body
   if (!isEmpty(globalTypeParam)) {
-    if (globalTypeParam?.isActive == 1) {
-      isActive = 0;
+    if (globalTypeParam?.isActive === 1) {
+      isActive = 0
     } else {
-      isActive = 1;
+      isActive = 1
     }
     logger.warn(
       {
@@ -395,13 +394,13 @@ const updateStatusGlobalType = async (req, res) => {
       {
         payload: globalTypeParam,
         msg: "Update status global type started.....",
-      }
-    );
+      },
+    )
 
     try {
       const isExists = await GlobalType.findOne({
-        where: { id: id },
-      });
+        where: { id },
+      })
       if (isEmpty(isExists)) {
         logger.error(
           {
@@ -411,15 +410,13 @@ const updateStatusGlobalType = async (req, res) => {
           {
             payload: globalTypeParam,
             msg: "Global type not exists.....",
-          }
-        );
-        res
-          .status(400)
-          .json({ status: false, error: MessageTag.GLOBALTYPE_NOT_EXIST });
-        return;
+          },
+        )
+        res.status(400).json({ status: false, error: MessageTag.GLOBALTYPE_NOT_EXIST })
+        return
       }
 
-      const result = await GlobalType.update(
+      await GlobalType.update(
         {
           isActive,
           updatedBy: "1",
@@ -427,14 +424,14 @@ const updateStatusGlobalType = async (req, res) => {
         },
         {
           where: {
-            id: id,
+            id,
           },
-        }
-      );
+        },
+      )
       res.status(200).send({
         status: true,
         message: MessageTag.GLOBALTYPE_UPDATE,
-      });
+      })
       logger.info(
         {
           component: "globalType --->",
@@ -442,9 +439,9 @@ const updateStatusGlobalType = async (req, res) => {
         },
         {
           data: isExists,
-          msg: "Global type updated,Id: " + id,
-        }
-      );
+          msg: `Global type updated,Id: ${id}`,
+        },
+      )
     } catch (error) {
       logger.error(
         {
@@ -452,14 +449,14 @@ const updateStatusGlobalType = async (req, res) => {
           method: "updateStatusGlobalType --->",
         },
         {
-          payload: displayName,
-          msg: "Catch error: " + error?.message,
-        }
-      );
-      res.status(400).json({ status: false, error: error?.message });
+          payload: null,
+          msg: `Catch error: ${error?.message}`,
+        },
+      )
+      res.status(400).json({ status: false, error: error?.message })
     }
   }
-};
+}
 module.exports = {
   masterGlobalType,
   addGlobalType,
@@ -467,4 +464,4 @@ module.exports = {
   deleteGlobalType,
   getGlobalType,
   updateStatusGlobalType,
-};
+}

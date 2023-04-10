@@ -1,2 +1,3 @@
-const connectToDB = require("./dbConnect");
-connectToDB();
+const connectToDB = require("./dbConnect")
+
+connectToDB()

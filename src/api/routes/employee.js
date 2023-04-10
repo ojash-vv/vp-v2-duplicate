@@ -1,5 +1,6 @@
-const express = require("express");
-const router = express.Router();
+const express = require("express")
+
+const router = express.Router()
 
 const {
   getListOfEmployees,
@@ -7,36 +8,51 @@ const {
   addNewEmployee,
   deleteEmployee,
   getNewEmpId,
-} = require("../controllers/employeeController");
-const { markAttendance } = require("../controllers/attendanceController");
+} = require("../controllers/employeeController")
 const {
   employeeDsr,
   getEmployeeDsr,
   getSingleEmployeeDsr,
   updateEmployeeDsr,
   filterEmployeeDsr,
-} = require("../controllers/employeeDsrController");
+} = require("../controllers/employeeDsrController")
 const {
   getAttendanceRecord,
   allEmployeeAttendance,
 } = require("../controllers/attendanceRecordController");
+const {
+  markLeave,
+  updateLeave,
+  getEmployeeLeave,
+  getEmployeeDayLeave,
+} = require("../controllers/leaveController");
 
-/*------employee list route-----------*/
-router.get("/", getListOfEmployees);
-router.post("/", addNewEmployee);
-router.patch("/", updateEmployeeData);
-router.delete("/:userId/:empId", deleteEmployee);
-router.post("/markAttendance", markAttendance);
-router.get("/getNewEmpId", getNewEmpId);
+const { isUserAuthenticated } = require("../middleware/auth-middleware")
 
-/*------employDsr route-----------*/
-router.post("/employeeDsr", employeeDsr);
-router.get("/get-EmployeeDsr", getEmployeeDsr);
-router.get("/getSingle-EmployeeDsr", getSingleEmployeeDsr);
-router.patch("/update-EmployeeDsr", updateEmployeeDsr);
-router.get("/filter-EmployeeDsr", filterEmployeeDsr);
+/* ------employee list route-----------*/
+router.get("/", isUserAuthenticated, getListOfEmployees)
+router.post("/", isUserAuthenticated, addNewEmployee)
+router.patch("/", isUserAuthenticated, updateEmployeeData)
+router.delete("/:userId/:empId", isUserAuthenticated, deleteEmployee)
+router.get("/getNewEmpId", isUserAuthenticated, getNewEmpId)
 
-/*----------------attendanceRecord----------------*/
-router.get("/attendance-record", getAttendanceRecord);
-router.get("/allAttendance-record", allEmployeeAttendance);
+/* ------employDsr route-----------*/
+router.post("/employeeDsr", isUserAuthenticated, employeeDsr)
+router.get("/get-EmployeeDsr", isUserAuthenticated, getEmployeeDsr)
+router.get("/getSingle-EmployeeDsr", isUserAuthenticated, getSingleEmployeeDsr)
+router.patch("/update-EmployeeDsr", isUserAuthenticated, updateEmployeeDsr)
+router.get("/filter-EmployeeDsr", isUserAuthenticated, filterEmployeeDsr)
+
+/* ----------------attendanceRecord----------------*/
+
+router.get("/attendance-record", isUserAuthenticated, getAttendanceRecord)
+router.get("/allAttendance-record", isUserAuthenticated, allEmployeeAttendance)
+
+/** *****************Employee Leave******************* */
+router.post("/markLeave", isUserAuthenticated, markLeave);
+router.put("/updateLeave/:id", isUserAuthenticated, updateLeave);
+
+router.get("/allEmployee-leave", isUserAuthenticated, getEmployeeLeave);
+router.get("/allEmployeeDay-leave", isUserAuthenticated, getEmployeeDayLeave);
+
 module.exports = router;

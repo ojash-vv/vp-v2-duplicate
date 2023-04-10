@@ -1,12 +1,15 @@
-const db = require("../models/index");
+/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
 const { Op } = require("sequelize");
+const { isEmpty } = require("lodash");
+const db = require("../models/index");
 const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { BadRequest, NotFound } = require("../../helper/apiErros");
+const { BadRequest, NotFound } = require("../../helper/apiErrors");
 const { logger } = require("../../helper/logger");
 const monthNames = require("../../enums/monthName");
-const { isEmpty } = require("lodash");
+
 const Attendance = db.attendanceRecord;
 const Employee = db.employee;
+
 const getWeekend = (daysInMonth, month, year) => {
   const weekends = [];
   for (let day = 1; day <= daysInMonth; day++) {
@@ -18,14 +21,14 @@ const getWeekend = (daysInMonth, month, year) => {
   return weekends;
 };
 const getAttendanceRecord = async (req, res) => {
-  const { year, empId } = req?.query;
+  const { year, empId } = req.query;
   try {
     if (!year || !empId) {
       throw new BadRequest();
     }
     const findAttendanceRecord = await Attendance.findAll({
       where: {
-        empId: empId,
+        empId,
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
         },
@@ -47,8 +50,9 @@ const getAttendanceRecord = async (req, res) => {
       const weekdaysInMonth = daysInMonth - weekendsDaysInMonth.length;
       const employeePresentDays = newAttendance.length;
       if (weekdaysInMonth || employeePresentDays) {
-        employeeName.data.push(month, {
-          presenDays: employeePresentDays,
+        employeeName.data.push({
+          monthName: month,
+          presentDays: employeePresentDays,
           workingDays: weekdaysInMonth,
         });
       }
@@ -58,6 +62,7 @@ const getAttendanceRecord = async (req, res) => {
       status: true,
       message: "success",
       data: employeeName,
+      statusCode: HttpStatusCode?.OK,
     });
     logger.info(
       {
@@ -66,7 +71,7 @@ const getAttendanceRecord = async (req, res) => {
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: "employess attendance record",
+        msg: "employees attendance record",
       }
     );
   } catch (error) {
@@ -80,19 +85,32 @@ const getAttendanceRecord = async (req, res) => {
         msg: `catch error: ${error?.msg}`,
       }
     );
-    res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message });
+    if (error?.httpCode) {
+      res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
+        status: error?.isOperational || false,
+        message: error?.message,
+        statusCode: error?.httpCode || HttpStatusCode.INTERNAL_SERVER,
+      });
+    }
   }
 };
 const allEmployeeAttendance = async (req, res) => {
   const allEmployeeAttendanceRecords = [];
-  const { year, empId, skip = 0, limit = 0 } = req?.query;
+  const { year, empId, skip = 0, limit = 0 } = req.query;
   try {
     if (!year || !empId) {
       throw new BadRequest();
     }
     const fetchedRecords = await Attendance.findAll({
-      offset: parseInt(skip),
-      limit: parseInt(limit),
+      offset: parseInt(skip, 10),
+      limit: parseInt(limit - skip, 10),
+      where: {
+        createdAt: {
+          [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
+        },
+      },
+    });
+    const totalCount = await Attendance.findAll({
       where: {
         createdAt: {
           [Op.between]: [new Date(year, 0, 1), new Date(year, 11, 31)],
@@ -100,24 +118,35 @@ const allEmployeeAttendance = async (req, res) => {
       },
     });
     if (isEmpty(fetchedRecords)) {
+      logger.error(
+        {
+          controller: "attendanceRecord",
+          method: "get all employee attendanceRecord",
+        },
+        {
+          empId: `employeeId :${empId} `,
+          msg: "employee Attendance Doesn't exist",
+        }
+      );
       throw new NotFound();
     }
     const processedIds = {};
     for (let i = 0; i < fetchedRecords.length; i++) {
-      const empId = fetchedRecords[i].empId;
+      const { newEmpId } = fetchedRecords[i];
       if (!processedIds[empId]) {
         processedIds[empId] = true;
+        // eslint-disable-next-line no-await-in-loop
         const employeeData = await Employee.findAll({
           where: {
-            empId: empId,
+            newEmpId,
           },
         });
 
         for (let user = 0; user < employeeData.length; user++) {
           const name = employeeData[user].userName;
           const currentEmployeeData = {
-            empId: empId,
-            name: name,
+            empId,
+            name,
             data: [],
           };
           for (let j = 0; j < 12; j++) {
@@ -133,7 +162,7 @@ const allEmployeeAttendance = async (req, res) => {
             const employeePresentDays = newAttendance.length;
             if (weekdaysInMonth || employeePresentDays) {
               currentEmployeeData.data.push({
-                month: month,
+                month,
                 presentDays: employeePresentDays,
                 workingDays: weekdaysInMonth,
               });
@@ -146,7 +175,10 @@ const allEmployeeAttendance = async (req, res) => {
     res.status(HttpStatusCode.OK).json({
       status: true,
       message: "success",
-      data: allEmployeeAttendanceRecords,
+      data: {
+        attendanceList: allEmployeeAttendanceRecords,
+        totalCount: totalCount?.length,
+      },
     });
     logger.info(
       {
@@ -165,8 +197,8 @@ const allEmployeeAttendance = async (req, res) => {
         method: "get all employee attendanceRecord",
       },
       {
-        empId: "employeeId" + empId,
-        msg: "catch error" + error?.msg,
+        empId: `employeeId${empId}`,
+        msg: `catch error${error?.msg}`,
       }
     );
     res.status(HttpStatusCode.BAD_REQUEST).json({

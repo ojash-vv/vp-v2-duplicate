@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize } = require("sequelize")
 
 const dbConfig = {
   name: process.env.DB_NAME,
@@ -7,18 +7,13 @@ const dbConfig = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: process.env.DB_DIALECT,
-};
+}
 
-const sequelize = new Sequelize(
-  dbConfig?.name,
-  dbConfig?.username,
-  dbConfig?.password,
-  {
-    host: dbConfig?.host,
-    port: dbConfig?.port,
-    dialect: dbConfig?.dialect,
-    pool: { min: 0, max: 5, idle: 10000 },
-  }
-);
+const sequelize = new Sequelize(dbConfig?.name, dbConfig?.username, dbConfig?.password, {
+  host: dbConfig?.host,
+  port: dbConfig?.port,
+  dialect: dbConfig?.dialect,
+  pool: { min: 0, max: 5, idle: 10000 },
+})
 
-module.exports = sequelize;
+module.exports = sequelize

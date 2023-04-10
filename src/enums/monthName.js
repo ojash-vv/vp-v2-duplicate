@@ -11,5 +11,5 @@ const monthNames = [
   "Oct",
   "Nov",
   "Dec",
-];
-module.exports = monthNames;
+]
+module.exports = monthNames

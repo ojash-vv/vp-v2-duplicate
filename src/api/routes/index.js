@@ -3,6 +3,8 @@ const authRoute = require("./auth");
 const globalTypeCategory = require("./globalTypeCategory");
 const globalType = require("./globalType");
 const employeeRoute = require("./employee");
+const staticContent = require("./staticContent");
+const eventRoute = require("./events");
 
 module.exports = {
   roleRoute,
@@ -10,4 +12,6 @@ module.exports = {
   globalTypeCategory,
   globalType,
   employeeRoute,
+  staticContent,
+  eventRoute,
 };
