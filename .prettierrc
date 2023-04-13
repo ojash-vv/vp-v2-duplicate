@@ -1,5 +1,5 @@
 {
-  "singleQuote": false,
+  "singleQuote": true,
   "trailingComma": "all",
   "printWidth": 100,
   "tabWidth": 2,
@@ -7,7 +7,7 @@
   "overrides": [
     {
       "files": ".prettierrc",
-      "options": { "parser": "espree" }
+      "options": { "parser": "babylon" }
     }
   ]
 }
