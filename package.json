@@ -5,10 +5,13 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run lint && nodemon app.js",
-    "lint": "eslint . --fix --max-warnings=0",
-    "format": "npm run lint && prettier . --write",
+    "start": "nodemon start",
     "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.ts": "npx tsc --noEmit",
+    "*.{js,jsx,ts,tsx}": "npx eslint",
+    "*.{js,jsx,ts,tsx,html,css}": "npx prettier --write "
   },
   "keywords": [
     "node",
@@ -40,17 +43,11 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
-    "eslint": "^8.37.0",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint": "^8.38.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
-    "esm": "^3.2.25",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.0",
-    "prettier": "2.8.7"
-  },
-  "lint-staged": {
-    "*.js": "npm run lint",
-    "*.{js,css,md,html,json}": "npm run format"
+    "eslint-plugin-prettier": "^4.2.1",
+    "lint-staged": "^13.2.1",
+    "prettier": "^2.8.7",
+    "husky": "^8.0.0"
   }
 }

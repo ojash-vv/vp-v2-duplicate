@@ -1,11 +1,11 @@
 /* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
-const { Op } = require("sequelize")
-const { isEmpty } = require("lodash")
-const db = require("../models/index")
-const HttpStatusCode = require("../../enums/httpErrorCodes")
-const { BadRequest, NotFound } = require("../../helper/apiErrors")
-const { logger } = require("../../helper/logger")
-const monthNames = require("../../enums/monthName")
+const { Op } = require('sequelize')
+const { isEmpty } = require('lodash')
+const db = require('../models/index')
+const HttpStatusCode = require('../../enums/httpErrorCodes')
+const { BadRequest, NotFound } = require('../../helper/apiErrors')
+const { logger } = require('../../helper/logger')
+const monthNames = require('../../enums/monthName')
 
 const Attendance = db.attendanceRecord
 const Employee = db.employee
@@ -60,32 +60,31 @@ const getAttendanceRecord = async (req, res) => {
 
     res.status(HttpStatusCode?.OK).json({
       status: true,
-      message: "success",
+      message: 'success',
       data: employeeName,
       statusCode: HttpStatusCode?.OK,
     })
     logger.info(
       {
-        controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        controller: 'attendanceRecord',
+        method: 'get employee attendanceRecord',
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: "employees attendance record",
+        msg: 'employees attendance record',
       },
     )
   } catch (error) {
     logger.error(
       {
-        controller: "attendanceRecord",
-        method: "get employee attendanceRecord",
+        controller: 'attendanceRecord',
+        method: 'get employee attendanceRecord',
       },
       {
         empId: `employeeId: ${empId}`,
         msg: `catch error: ${error?.msg}`,
       },
     )
-    // res.status(HttpStatusCode?.BAD_REQUEST).json({ message: error?.message })
     if (error?.httpCode) {
       res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
         status: error?.isOperational || false,
@@ -121,8 +120,8 @@ const allEmployeeAttendance = async (req, res) => {
     if (isEmpty(fetchedRecords)) {
       logger.error(
         {
-          controller: "attendanceRecord",
-          method: "get all employee attendanceRecord",
+          controller: 'attendanceRecord',
+          method: 'get all employee attendanceRecord',
         },
         {
           empId: `employeeId :${empId} `,
@@ -136,6 +135,7 @@ const allEmployeeAttendance = async (req, res) => {
       const { newEmpId } = fetchedRecords[i]
       if (!processedIds[empId]) {
         processedIds[empId] = true
+        // eslint-disable-next-line no-await-in-loop
         const employeeData = await Employee.findAll({
           where: {
             newEmpId,
@@ -172,7 +172,7 @@ const allEmployeeAttendance = async (req, res) => {
     }
     res.status(HttpStatusCode.OK).json({
       status: true,
-      message: "success",
+      message: 'success',
       data: {
         attendanceList: allEmployeeAttendanceRecords,
         totalCount: totalCount?.length,
@@ -180,19 +180,19 @@ const allEmployeeAttendance = async (req, res) => {
     })
     logger.info(
       {
-        controller: "attendanceRecord",
-        method: "get all employee attendanceRecord",
+        controller: 'attendanceRecord',
+        method: 'get all employee attendanceRecord',
       },
       {
         empId: `employeeId: ${empId}`,
-        msg: "get all employee attendance record",
+        msg: 'get all employee attendance record',
       },
     )
   } catch (error) {
     logger.error(
       {
-        controller: "attendanceRecord",
-        method: "get all employee attendanceRecord",
+        controller: 'attendanceRecord',
+        method: 'get all employee attendanceRecord',
       },
       {
         empId: `employeeId${empId}`,
@@ -201,7 +201,7 @@ const allEmployeeAttendance = async (req, res) => {
     )
     res.status(HttpStatusCode.BAD_REQUEST).json({
       status: false,
-      message: "error",
+      message: 'error',
       error: error?.message,
     })
   }

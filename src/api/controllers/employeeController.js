@@ -1,11 +1,12 @@
-const { isEmpty } = require("lodash");
-const bcrypt = require("bcryptjs");
-const MessageTag = require("../../enums/messageNums");
-const db = require("../models/index");
-const HttpStatusCode = require("../../enums/httpErrorCodes");
-const { APIError, BadRequest, NotFound } = require("../../helper/apiErrors");
-const { logger } = require("../../helper/logger");
-const Employee = db.employee;
+const { isEmpty } = require('lodash')
+const bcrypt = require('bcryptjs')
+const MessageTag = require('../../enums/messageNums')
+const db = require('../models/index')
+const HttpStatusCode = require('../../enums/httpErrorCodes')
+const { APIError, BadRequest, NotFound } = require('../../helper/apiErrors')
+const { logger } = require('../../helper/logger')
+
+const Employee = db.employee
 
 const getListOfEmployees = async (req, res) => {
   const { skip = 0, limit = 0 } = req.query
@@ -13,14 +14,14 @@ const getListOfEmployees = async (req, res) => {
     const employee = await Employee.findAll({
       offset: parseInt(skip, 10),
       limit: parseInt(limit - skip, 10),
-      order: [["userId", "DESC"]],
+      order: [['userId', 'DESC']],
     })
     const totalEmpCount = await Employee.findAll()
     if (employee) {
       res.status(200).json({
         status: true,
         data: { employee, totalCount: totalEmpCount?.length },
-        message: "success",
+        message: 'success',
       })
     }
   } catch (error) {
@@ -63,12 +64,12 @@ const updateEmployeeData = async (req, res) => {
     ) {
       logger.error(
         {
-          controller: "employeeController --->",
-          method: "updateEmployeeData --->",
+          controller: 'employeeController --->',
+          method: 'updateEmployeeData --->',
         },
         {
           payload: `Requested employee: ${userName} and employee id :${empId}`,
-          msg: "Bad request by the client",
+          msg: 'Bad request by the client',
         },
       )
       throw new BadRequest()
@@ -82,15 +83,15 @@ const updateEmployeeData = async (req, res) => {
     if (isEmpty(isExists)) {
       logger.error(
         {
-          controller: "employeeController --->",
-          method: "updateEmployeeData --->",
+          controller: 'employeeController --->',
+          method: 'updateEmployeeData --->',
         },
         {
           payload: `Requested employee: ${userName} and employee id :${empId}`,
-          msg: "User not found",
+          msg: 'User not found',
         },
       )
-      throw new NotFound(null, null, null, "User not found")
+      throw new NotFound(null, null, null, 'User not found')
     }
 
     const isUpdated = await Employee.update(
@@ -128,25 +129,25 @@ const updateEmployeeData = async (req, res) => {
     if (!isEmpty(isUpdated)) {
       res.status(200).json({
         status: true,
-        message: "success",
+        message: 'success',
         data: updatedUser,
       })
       logger.info(
         {
-          controller: "employeeController --->",
-          method: "updateEmployeeData --->",
+          controller: 'employeeController --->',
+          method: 'updateEmployeeData --->',
         },
         {
           payload: `Requested employee: ${userName} and employee id :${empId}`,
-          msg: "Record updated successfully",
+          msg: 'Record updated successfully',
         },
       )
     }
   } catch (error) {
     logger.error(
       {
-        controller: "employeeController --->",
-        method: "updateEmployeeData --->",
+        controller: 'employeeController --->',
+        method: 'updateEmployeeData --->',
       },
       {
         payload: `Requested employee: ${userName} and employee id :${empId}`,
@@ -205,10 +206,10 @@ const addNewEmployee = async (req, res) => {
       },
     })
     if (!isEmpty(isExists)) {
-      throw new APIError("Conflict", HttpStatusCode.CONFLICT, false, MessageTag.EMAIL_EXISTS)
+      throw new APIError('Conflict', HttpStatusCode.CONFLICT, false, MessageTag.EMAIL_EXISTS)
     }
     if (!isEmpty(isEmpIdExists)) {
-      throw new APIError("Conflict", HttpStatusCode.CONFLICT, false, MessageTag.EMPLOYEE_ID_EXISTS)
+      throw new APIError('Conflict', HttpStatusCode.CONFLICT, false, MessageTag.EMPLOYEE_ID_EXISTS)
     }
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(empPassword, salt)
@@ -234,7 +235,7 @@ const addNewEmployee = async (req, res) => {
     if (!isEmpty(isCreated)) {
       res.status(200).json({
         status: true,
-        message: "success",
+        message: 'success',
         data: isCreated,
         statusCode: HttpStatusCode.OK,
       })
@@ -288,7 +289,7 @@ const deleteEmployee = async (req, res) => {
     if (!isEmpty(isDeleted)) {
       res.status(200).json({
         status: true,
-        message: "success",
+        message: 'success',
         data: isDeleted[1][0],
         statusCode: HttpStatusCode.OK,
       })
@@ -305,27 +306,27 @@ const deleteEmployee = async (req, res) => {
 const getNewEmpId = async (req, res) => {
   try {
     const lastRecord = await Employee.findOne({
-      order: [["userId", "DESC"]],
+      order: [['userId', 'DESC']],
     })
     if (isEmpty(lastRecord)) {
       throw new NotFound()
     }
     const { empId } = lastRecord
-    const newEmpId = `VVT-${parseInt(empId.split("-")[1], 10) + 1}`
+    const newEmpId = `VVT-${parseInt(empId.split('-')[1], 10) + 1}`
     res.status(200).json({
       status: true,
-      message: "success",
+      message: 'success',
       data: newEmpId,
       statusCode: HttpStatusCode.OK,
     })
     logger.info(
       {
-        controller: "employeeController --->",
-        method: "getNewEmpId --->",
+        controller: 'employeeController --->',
+        method: 'getNewEmpId --->',
       },
       {
         payload: null,
-        msg: "Record fetch and sent successfully",
+        msg: 'Record fetch and sent successfully',
       },
     )
   } catch (error) {

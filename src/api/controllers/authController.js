@@ -1,21 +1,22 @@
 /* eslint-disable no-await-in-loop */
 /* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
-const { isEmpty } = require("lodash")
-const bcrypt = require("bcryptjs")
-const validator = require("validator")
-const jwt = require("jsonwebtoken")
-const db = require("../models/index")
-const { logger } = require("../../helper/logger")
-const HttpStatusCode = require("../../enums/httpErrorCodes")
-const MessageTag = require("../../enums/messageNums")
-const Auth = db.auth;
-const RolePermissions = db.roleAndPermissions;
-const GlobalType = db.globalType;
-const { Unauthorized, NotFound,APIError } = require("../../helper/apiErrors");
-require("dotenv").config();
+const { isEmpty } = require('lodash')
+const bcrypt = require('bcryptjs')
+const validator = require('validator')
+const jwt = require('jsonwebtoken')
+const db = require('../models/index')
+const { logger } = require('../../helper/logger')
+const HttpStatusCode = require('../../enums/httpErrorCodes')
+const MessageTag = require('../../enums/messageNums')
+
+const Auth = db.auth
+const RolePermissions = db.roleAndPermissions
+const GlobalType = db.globalType
+const { APIError } = require('../../helper/apiErrors')
+require('dotenv').config()
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1d" })
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
 }
 
 const loginUser = async (req, res) => {
@@ -24,8 +25,8 @@ const loginUser = async (req, res) => {
   if (!isEmpty(loginAuth)) {
     const email = loginAuth?.email
     logger.warn(
-      { component: "auth --->", method: "loginUser --->" },
-      { user: email, msg: "Running login api" },
+      { component: 'auth --->', method: 'loginUser --->' },
+      { user: email, msg: 'Running login api' },
     )
 
     const password = loginAuth?.password
@@ -51,7 +52,7 @@ const loginUser = async (req, res) => {
             })
             if (listOfPermissions?.length > 0) {
               logger.info(
-                { component: "auth", method: "loginUser" },
+                { component: 'auth', method: 'loginUser' },
                 {
                   user: email,
                   message: `permissions fetched successfully.Length of permissions are ${listOfPermissions?.length}`,
@@ -63,19 +64,19 @@ const loginUser = async (req, res) => {
                 const moduleName = await GlobalType.findOne({
                   where: {
                     id: moduleId,
-                    globalTypeCategory_uniqeValue: "modules",
+                    globalTypeCategory_uniqeValue: 'modules',
                   },
                 })
                 userRoles[`${moduleName?.displayName}`] = JSON.stringify(permissions)?.includes(
-                  "all",
+                  'all',
                 )
-                  ? "all"
+                  ? 'all'
                   : Object.keys(permissions)[0]
               }
             }
           } catch (e) {
             logger.error(
-              { component: "auth", method: "loginUser" },
+              { component: 'auth', method: 'loginUser' },
               {
                 user: email,
                 error: e,
@@ -91,36 +92,44 @@ const loginUser = async (req, res) => {
             message: MessageTag.WelcomeMsg,
           })
           logger.info(
-            { component: "auth", method: "loginUser" },
+            { component: 'auth', method: 'loginUser' },
             {
               user: isExists,
               msg: `Login successfully: ${email}`,
             },
           )
         } else {
-          logger.error(
-            { component: "auth --->", method: "loginUser --->" },
+          logger.warn(
+            { component: 'auth --->', method: 'loginUser --->' },
             {
               user: isExists,
               msg: `Password Incorrect for user: ${email}`,
             },
           )
-          throw new Unauthorized()
+          res.status(200).json({
+            user: email,
+            status: false,
+            message: MessageTag.PasswordWrong,
+          })
         }
       } else {
-        throw new NotFound("User not found");
+        res.status(200).json({
+          user: email,
+          status: false,
+          message: MessageTag.EMAIL_NOT_FOUND,
+        })
       }
     } catch (error) {
       logger.error(
         {
-          controller: "authController --->",
-          method: "loginUser --->",
+          controller: 'authController --->',
+          method: 'loginUser --->',
         },
         {
           payload: `Requested employee: ${email} `,
           msg: `error:${error}`,
-        }
-      );
+        },
+      )
       if (error) {
         res.status(error?.httpCode || HttpStatusCode.INTERNAL_SERVER).json({
           status: error?.isOperational || false,
