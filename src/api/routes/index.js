@@ -5,7 +5,7 @@ const globalType = require('./globalType')
 const employeeRoute = require('./employee')
 const staticContent = require('./staticContent')
 const eventRoute = require('./events')
-const saveFormDataRoute = require('./saveFormData')
+// const saveFormDataRoute = require('./saveFormData')
 
 module.exports = {
   roleRoute,
@@ -15,5 +15,5 @@ module.exports = {
   employeeRoute,
   staticContent,
   eventRoute,
-  saveFormDataRoute,
+  // saveFormDataRoute,
 }
