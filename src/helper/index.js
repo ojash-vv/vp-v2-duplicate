@@ -35,7 +35,7 @@ function getDates(startDate, endDate) {
   const dates = []
 
   while (date <= endDate) {
-    let dateNew=new Date(date).toDateString();
+    const dateNew=new Date(date).toDateString();
     const formatDate=this.formatDate(dateNew)
     dates.push(formatDate);
     date.setDate(date.getDate() + 1);

@@ -19,7 +19,7 @@ const markLeave = async (req, res) => {
   let leaveStatus;
   logger.warn(
     {
-      component: "leaveController --->",
+      controller: "leaveController --->",
       method: "markLeave --->",
     },
     { payload: req?.body, msg: "Mark Leave started....." },
@@ -56,7 +56,7 @@ const markLeave = async (req, res) => {
     if (!isEmpty(isExists)) {
       logger.error(
         {
-          component: "leaveController --->",
+          controller: "leaveController --->",
           method: "markLeave --->",
         },
         {
@@ -102,7 +102,7 @@ const markLeave = async (req, res) => {
       })
       logger.info(
         {
-          component: "leaveController --->",
+          controller: "leaveController --->",
           method: "markLeave --->",
         },
         {
@@ -114,7 +114,7 @@ const markLeave = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "markLeave --->",
       },
       {
@@ -139,7 +139,7 @@ const markLeave = async (req, res) => {
 
 const updateLeave = async (req, res) => {
   const { id } = req?.params;
-  const {startLeaveDate,endLeaveDate, leaveDate, empId = null, leaveType, leaveReason = null, employeeId = null  } = req?.body;
+  const {startLeaveDate,endLeaveDate, empId = null, leaveType, leaveReason = null, employeeId = null  } = req?.body;
 
   const startDateUtc = ObjectHelper.formatDate(startLeaveDate);
   const enadDateUtc = ObjectHelper.formatDate(endLeaveDate);
@@ -149,7 +149,7 @@ const updateLeave = async (req, res) => {
 
   logger.warn(
     {
-      component: "leaveController --->",
+      controller: "leaveController --->",
       method: "updateLeave --->",
     },
     { payload: req?.body, msg: "Update Leave started....." },
@@ -184,7 +184,7 @@ const updateLeave = async (req, res) => {
     if (!isEmpty(isExists) && isExists?.id !== id) {
       logger.error(
         {
-          component: "leaveController --->",
+          controller: "leaveController --->",
           method: "updateLeave --->",
         },
         {
@@ -227,7 +227,7 @@ const updateLeave = async (req, res) => {
 
       logger.info(
         {
-          component: "leaveController --->",
+          controller: "leaveController --->",
           method: "updateLeave --->",
         },
         {
@@ -239,7 +239,7 @@ const updateLeave = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "updateLeave --->",
       },
       {
@@ -264,21 +264,16 @@ const updateLeave = async (req, res) => {
 
 const getEmployeeLeave = async (req, res) => {
   const { userRole,employeeId } = req?.query;
-  let leaveResult=[];
+  const leaveResult=[];
   logger.warn(
     {
-      component: "leaveController --->",
+      controller: "leaveController --->",
       method: "getEmployeeLeave --->",
     },
     { payload: null, msg: "Get Employee Leave started....." },
   )
 
   try {
-    const result = await EmployeeLeave.findAll({
-      where: {
-        where: sequelize.where(sequelize.col("leaveStatus"), "=", "1"),
-      },
-    });
     if(userRole==='admin')
     {
       const [leaveResult, metadata] = await db.sequelize.query(
@@ -308,7 +303,7 @@ const getEmployeeLeave = async (req, res) => {
    
     logger.info(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "getEmployeeLeave --->",
       },
       {
@@ -319,7 +314,7 @@ const getEmployeeLeave = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "getEmployeeLeave --->",
       },
       {
@@ -334,7 +329,7 @@ const getEmployeeLeave = async (req, res) => {
 const getEmployeeDayLeave = async (req, res) => {
   logger.warn(
     {
-      component: "leaveController --->",
+      controller: "leaveController --->",
       method: "getEmployeeDayLeave --->",
     },
     { payload: null, msg: "Get Employee Day Leave started....." },
@@ -357,7 +352,7 @@ const getEmployeeDayLeave = async (req, res) => {
     })
     logger.info(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "getEmployeeDayLeave --->",
       },
       {
@@ -368,7 +363,7 @@ const getEmployeeDayLeave = async (req, res) => {
   } catch (error) {
     logger.error(
       {
-        component: "leaveController --->",
+        controller: "leaveController --->",
         method: "getEmployeeDayLeave --->",
       },
       {
